@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import matplotlib.cm as cm
 import numpy as np
+import datetime
 import os
 import re
 import sys
@@ -20,6 +21,18 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	# N = range(256,9985,512)
 	N = range(256, 10241, 512)
 	dft = pandas.read_csv('result_pack')
+
+	# name formatting stuff
+	nowRaw = datetime.datetime.now()
+	dateStr = str(nowRaw.date()) + '_' + str(nowRaw.hour) + '' + str(nowRaw.minute)
+	resDir = './results/'
+	resDateDir = resDir + str(nowRaw.date())
+	if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
+		os.mkdir(resDir)
+		if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
+				os.mkdir(resDateDir)
+
+	plotsDir = resDateDir + '/'
 	#
 	#
 	plt.figure(figsize = (6,4))
@@ -38,7 +51,7 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	plt.xticks(range(0,10001,2000), fontsize = 18)
 	plt.yticks( fontsize = 20)
 	plt.legend(loc = "upper left", prop={'size': 14})
-	plt.savefig("%s_perf.pdf" % fname, bbox_inches='tight')
+	plt.savefig("%s%s_%s_perf.pdf" % (plotsDir, dateStr, fname), bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')
@@ -58,7 +71,7 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	plt.yticks(np.arange(0,1.5,0.5), fontsize = 20)
 	plt.ylabel("DRAM Bw (GB/s)", fontsize = 24)
 	plt.legend(loc = "lower right", prop={'size': 14})
-	plt.savefig("%s_dram.pdf" % fname, bbox_inches='tight')
+	plt.savefig("%s%s_%s_dram.pdf" % (plotsDir, dateStr, fname) , bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')
