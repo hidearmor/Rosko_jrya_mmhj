@@ -26,11 +26,9 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	N = range(256, 10241, 512)
 	dft = pandas.read_csv('result_pack')
 
-	# name formatting and directory placement
-	timeNowRaw = datetime.datetime.now()
-	dateStr = str(timeNowRaw.date()) + '_' + str(timeNowRaw.hour) + '' + str(timeNowRaw.minute)
-	# create results folders if not there and put plots in them
-	plotsDir = getPlotsDirectory(timeNowRaw, os.getcwd())
+	# create results folders if not there and put plots in them, and get time
+	plotsDir, dateStr = getPlotsDirectory(os.getcwd())
+	# dateStr = str(timeNow.date()) + '_' + str(timeNow.hour) + '' + str(timeNow.minute)
 	
 	
 	plt.figure(figsize = (6,4))
