@@ -20,25 +20,12 @@ echo $CAKE_HOME;
 make;
 
 # check if result_pack exists and if it does, move it
-# uses python script
 FILE="result_pack"
-PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
-FUNCTION_NAME="getPlotsDirectory"
-cwd=$PWD
 
 # Check if the result_pack file already exists
 if [ -f "$FILE" ]; then
-    echo "File '$FILE' exists. Running Python script..."
-
-    # Call the Python script with the function name as an argument
-    output=$(python3 "$PYTHON_SCRIPT_PATH" "$FUNCTION_NAME" "$cwd")
-    
-    # Read the output values
-    path=$(echo "$output" | sed -n '1p')
-    time=$(echo "$output" | sed -n '2p')
-	underscore="_"
-
-	mv $FILE $path$time$underscore$FILE
+	rm -f $FILE
+    echo "File '$FILE' exists. Removing..."
 else
     echo "File '$FILE' does not exist."
 fi
@@ -58,3 +45,15 @@ do
 	done
 done
 
+PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
+FUNCTION_NAME="getPlotsDirectory"
+cwd=$PWD
+# Call the Python script with the function name as an argument
+output=$(python3 "$PYTHON_SCRIPT_PATH" "$FUNCTION_NAME" "$cwd")
+
+# Read the output values
+path=$(echo "$output" | sed -n '1p')
+time=$(echo "$output" | sed -n '2p')
+underscore="_"
+
+cp $FILE $path$time$underscore$FILE
