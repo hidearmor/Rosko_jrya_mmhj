@@ -9,11 +9,15 @@ import re
 import sys
 from matplotlib import ticker as mticker
 
+#set env path to root directory ?? for python liibrary function to work
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from plotslib.plot_utils import getPlotsDirectory
+
 
 def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	plt.rcParams.update({'font.size': 12})
 	markers = ['o','v','s','d','^']
-	colors = ['b','g','k','r','r']
+	colors = ['b','g','k','r','r']	
 	labels = ['CSR 80%', 'Rosko 80%', 'CSR 87%', 'Rosko 87%', 'CSR 95%', 'Rosko 95%']
 	sparsity = [80, 87, 95]
 	# N = range(768+1024,9985,512)
@@ -22,19 +26,13 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	N = range(256, 10241, 512)
 	dft = pandas.read_csv('result_pack')
 
-	# name formatting stuff
-	nowRaw = datetime.datetime.now()
-	dateStr = str(nowRaw.date()) + '_' + str(nowRaw.hour) + '' + str(nowRaw.minute)
-	resDir = './results/'
-	resDateDir = resDir + str(nowRaw.date())
-	if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
-		os.mkdir(resDir)
-		if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
-				os.mkdir(resDateDir)
-
-	plotsDir = resDateDir + '/'
-	#
-	#
+	# name formatting and directory placement
+	timeNowRaw = datetime.datetime.now()
+	dateStr = str(timeNowRaw.date()) + '_' + str(timeNowRaw.hour) + '' + str(timeNowRaw.minute)
+	# create results folders if not there and put plots in them
+	plotsDir = getPlotsDirectory(timeNowRaw, os.getcwd())
+	
+	
 	plt.figure(figsize = (6,4))
 	for i in range(len(sparsity)):
 		q = (dft[(dft['algo'] == 'mkl time') & (dft['sp'] == sparsity[i]) & (dft['store'] == 0)]['bw'].values \
