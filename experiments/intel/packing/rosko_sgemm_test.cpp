@@ -59,8 +59,8 @@ int main( int argc, char** argv ) {
 		stat(argv[5], &buffer);
 		int csr_bytes = buffer.st_size;
 		csr = file_to_csr(argv[5]);
-		printf("csr pack time: %f \n", csr_times[i]); 
-		printf("csr bytes: %d \n", csr_bytes); 
+		// printf("csr pack time: %f \n", csr_times[i]); 
+		// printf("csr bytes: %d \n", csr_bytes); 
 
 		// measure Rosko packing DRAM bw
 		blk_dims_t* x = (blk_dims_t*) malloc(sizeof(blk_dims_t));
@@ -101,6 +101,9 @@ int main( int argc, char** argv ) {
 	double rosko_time 	= calculate_median(rosko_times, runs);
 	float csr_bw 		= calculate_median(csr_bws, runs);
 	float rosko_bw 		= calculate_median(rosko_bws, runs);
+
+	printf("csr pack time: %f \n", csr_time); 
+	printf("rosko pack time median: %f \n", rosko_time);
 
 // -------------- OLD ---------------------
 
