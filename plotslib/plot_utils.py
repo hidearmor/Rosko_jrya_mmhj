@@ -22,8 +22,8 @@ def getPlotsDirectory(cwd):
     resDateDir = resDir + str(time.date())
     if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
         os.mkdir(resDir)
-        if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
-                os.mkdir(resDateDir)
+    if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
+            os.mkdir(resDateDir)
     
     dateStr = str(time.date()) + '_' + str(time.hour) + '' + str(time.minute)
 
