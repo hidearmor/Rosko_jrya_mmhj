@@ -31,16 +31,22 @@ else
 fi
 
 # result pack is created and gets headers
-echo "algo,store,M,K,N,sp,bw" >> result_pack
+# echo "algo,store,M,K,N,sp,bw" >> result_pack
+echo "algo,store,M,K,N,sp,bw,runs" >> result_pack
 
-runs = 10
+declare -i runs=10
+echo "runs $runs"
+
+# exit;
 
 # for i in 80 82 85 87 90 92 95 97 99
-for i in 80 87 95
+for i in 80 87 95 # this one
+# for i in 80 87
 do
-	for n in {256..10240..512}
+	for n in {256..10240..512} # this one
+	# for n in {256..2533..512}
 	do
-
+		#  it uses only 1 core
 		./rosko_sgemm_test $n $n 1 $i csr_file rosko_file 0 $runs;
 		./rosko_sgemm_test $n $n 1 $i csr_file rosko_file 1 $runs;
 

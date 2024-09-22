@@ -36,7 +36,7 @@ int main( int argc, char** argv ) {
 	store = atoi(argv[7]);
 	runs = atoi(argv[8]);
 
-	printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, runs = %d\n", M,K,N,p, ((float) sp) / 100.0), runs;
+	printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, runs = %d\n", M,K,N,p, ((float) sp) / 100.0, runs);
 
 	// preparations/setup
 	float* A = (float*) malloc(M * K * sizeof( float ));
@@ -63,6 +63,7 @@ int main( int argc, char** argv ) {
 		// printf("csr bytes: %d \n", csr_bytes); 
 
 		// measure Rosko packing DRAM bw
+		// is t his block supposed to be by itself ?
 		blk_dims_t* x = (blk_dims_t*) malloc(sizeof(blk_dims_t));
 		init_sparse_block_dims(M, N, K, p, x, cake_cntx, sch, NULL, density, 4, 0);
 		size_t A_sz = cake_sgemm_packed_A_size(M, K, p, x, cake_cntx, sch) / sizeof(float);
@@ -105,6 +106,26 @@ int main( int argc, char** argv ) {
 	printf("csr pack time: %f \n", csr_time); 
 	printf("rosko pack time median: %f \n", rosko_time);
 
+	printf("rosko bw = %f, csr bw = %f\n", rosko_bw, csr_bw);
+	printf("runs %d", runs);
+
+
+    char fname[50];
+    snprintf(fname, sizeof(fname), "result_pack");
+    FILE *fp;
+    fp = fopen(fname, "a");
+    fprintf(fp, "rosko bw,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,rosko_bw,runs);
+    fprintf(fp, "mkl bw,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,csr_bw,runs);
+    fprintf(fp, "rosko time,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,rosko_time,runs);
+    fprintf(fp, "mkl time,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,csr_time,runs);
+
+    fclose(fp);
+	
+	free_csr(csr);
+	free(A);
+
+	return 0;
+
 // -------------- OLD ---------------------
 
 	// // measure MKL-CSR packing DRAM bw
@@ -113,8 +134,8 @@ int main( int argc, char** argv ) {
 	// stat(argv[5], &buffer);
 	// int csr_bytes = buffer.st_size;
 	// csr = file_to_csr(argv[5]);
-	// printf("csr pack time: %f \n", csr_time); 
-	// printf("csr bytes: %d \n", csr_bytes); 
+	// // printf("csr pack time: %f \n", csr_time); 
+	// // printf("csr bytes: %d \n", csr_bytes); 
 
 
 	// // measure Rosko packing DRAM bw
@@ -145,37 +166,33 @@ int main( int argc, char** argv ) {
 
 	// float rosko_bw = ((float) (rosko_bytes + M*K*4)) / rosko_time / 1e9;
 
-// -----------------------------------
 
-	// JONAS here below BW's are set/calculated 
 
-	// (1 read of M*K matrix A) + (writing nonzeros and indexing arrays)
-	// float csr_bw = ((float) (csr_bytes + M*K*4)) / csr_time / 1e9;
-	// float rosko_bw = ((float) (rosko_bytes + M*K*4)) / rosko_time / 1e9;
+	// printf("rosko bw = %f, csr bw = %f\n", rosko_bw, csr_bw);
+
+
+    // char fname[50];
+    // snprintf(fname, sizeof(fname), "result_pack");
+    // FILE *fp;
+    // fp = fopen(fname, "a");
+    // fprintf(fp, "rosko bw,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,rosko_bw);
+    // fprintf(fp, "mkl bw,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,csr_bw);
+    // fprintf(fp, "rosko time,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,rosko_time);
+    // fprintf(fp, "mkl time,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,csr_time);
+
+    // fclose(fp);
 	
-	printf("rosko bw = %f, csr bw = %f\n", rosko_bw, csr_bw);
+	// free_csr(csr);
+	// free(A);
 
-
-    char fname[50];
-    snprintf(fname, sizeof(fname), "result_pack");
-    FILE *fp;
-    fp = fopen(fname, "a");
-    fprintf(fp, "rosko bw,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,rosko_bw);
-    fprintf(fp, "mkl bw,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,csr_bw);
-    fprintf(fp, "rosko time,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,rosko_time);
-    fprintf(fp, "mkl time,%d,%d,%d,%d,%d,%f\n",store,M,K,N,sp,csr_time);
-
-    fclose(fp);
-	
-
-
-	free_csr(csr);
-	free(A);
 	// free_sp_pack(sp_pack1);
 	// free(A_p);
 	// free(sp_pack);
 	// free(x);
-	return 0;
+
+	// return 0;
+
+	// -----------------------------------
 }
 
 
