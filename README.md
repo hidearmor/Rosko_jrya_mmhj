@@ -79,6 +79,10 @@ The script below runs 20 trials of an SpMM example on 8 cores for multiplying a 
 
 ```bash
 (base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj$ source ./env.sh
+(base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj$ cd CAKE_on_CPU/
+(base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj/CAKE_on_CPU$ source ./env.sh
+(base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj/CAKE_on_CPU$ cd ..
+(base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj$ source ./env.sh
 (base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj$ cd examples/
 (base) mmhj@DESKTOP-INVCLHF:~/ITU/Rosko_jrya_mmhj/examples$ make
 g++ -I/home/mmhj/ITU/Rosko_jrya_mmhj/include -I/home/mmhj/ITU/Rosko_jrya_mmhj/CAKE_on_CPU/include -O3 -g -mavx -mfma -fopenmp rosko_sgemm_test.cpp -L/home/mmhj/ITU/Rosko_jrya_mmhj -lrosko -L/home/mmhj/ITU/Rosko_jrya_mmhj/CAKE_on_CPU -lcake -o rosko_sgemm_test
@@ -119,7 +123,7 @@ sss 0.032765
 0,90.000000,3000,2000,1000,0.035282
 CORRECT!
 ```
-
+The first or last source of env.sh in the Rosko_jrya_mmhj repo is likely redundant, so feel free to omit one of them. If you have previously compiled the programs via the `make` command (which performs the actions written in the Makefile), you should first cleanup your environment with the `make clean` command. This is a generic way to clean up the code, i.e. remove all the compiled object files from the source code. This command is also specified in the Makefile.
 
 
 ## Running Experiments:

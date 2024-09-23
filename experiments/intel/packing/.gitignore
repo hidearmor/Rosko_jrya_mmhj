@@ -1,0 +1,5 @@
+# Ignore C++ object files
+*.so
+*.o
+
+rosko_sgemm_test
