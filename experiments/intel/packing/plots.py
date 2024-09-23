@@ -30,10 +30,7 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 
 	# create results folders if not there and put plots in them, and get time
 	file_path = Path('./result_pack')
-	# Get the metadata change time (st_ctime) in seconds
-	creation_time = file_path.stat().st_ctime
-	# Convert the timestamp into a datetime object
-	creation_datetime = datetime.datetime.fromtimestamp(creation_time)
+	creation_datetime = datetime.datetime.fromtimestamp(file_path.stat().st_ctime)
 	plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
 	
 	
