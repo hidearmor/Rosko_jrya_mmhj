@@ -18,6 +18,11 @@ import datetime
 # returns: 1) directory for files as string 2) time 
 def getPlotsDirectory(cwd):
     time = datetime.datetime.now()
+    dir, dateStr = directoriesFromTime(time, cwd)
+
+    return dir, dateStr
+
+def directoriesFromTime(time, cwd):
     resDir = cwd + '/results/'
     resDateDir = resDir + str(time.date())
     if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
