@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <numeric>
 #include <stdlib.h>
 
 // Comparison function for qsort
@@ -14,6 +15,11 @@ double calculate_median(double* array, int runs) {
     return (runs % 2 == 0) ?
 		((array[runs / 2 - 1] + array[runs / 2]) / 2.0) :
 		(array[runs / 2]);
+}
+
+double calculate_mean(double* array, int runs)
+{
+    return std::accumulate( array, array + runs, 0.0) / (double)(runs);
 }
 
 int main( int argc, char** argv ) {
@@ -98,10 +104,15 @@ int main( int argc, char** argv ) {
 		free(x);
 	}
 
-	double csr_time 	= calculate_median(csr_times, runs);
-	double rosko_time 	= calculate_median(rosko_times, runs);
-	float csr_bw 		= calculate_median(csr_bws, runs);
-	float rosko_bw 		= calculate_median(rosko_bws, runs);
+	// double csr_time 	= calculate_median(csr_times, runs);
+	// double rosko_time 	= calculate_median(rosko_times, runs);
+	// float csr_bw 		= calculate_median(csr_bws, runs);
+	// float rosko_bw 		= calculate_median(rosko_bws, runs);
+
+	double csr_time 	= calculate_mean(csr_times, runs);
+	double rosko_time 	= calculate_mean(rosko_times, runs);
+	float csr_bw 		= calculate_mean(csr_bws, runs);
+	float rosko_bw 		= calculate_mean(rosko_bws, runs);
 
 	printf("csr pack time: %f \n", csr_time); 
 	printf("rosko pack time median: %f \n", rosko_time);
