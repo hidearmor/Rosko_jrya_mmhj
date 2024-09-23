@@ -7,11 +7,12 @@ import datetime
 import os
 import re
 import sys
+from pathlib import Path
 from matplotlib import ticker as mticker
 
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-from plotslib.plot_utils import getPlotsDirectory
+from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 
 
 def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
@@ -25,10 +26,15 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	# N = range(256,9985,512)
 	N = range(256, 10241, 512)
 	dft = pandas.read_csv('result_pack')
+	runs = dft['runs'].iloc[0]
 
 	# create results folders if not there and put plots in them, and get time
-	plotsDir, dateStr = getPlotsDirectory(os.getcwd())
-	# dateStr = str(timeNow.date()) + '_' + str(timeNow.hour) + '' + str(timeNow.minute)
+	file_path = Path('./result_pack')
+	# Get the metadata change time (st_ctime) in seconds
+	creation_time = file_path.stat().st_ctime
+	# Convert the timestamp into a datetime object
+	creation_datetime = datetime.datetime.fromtimestamp(creation_time)
+	plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
 	
 	
 	plt.figure(figsize = (6,4))
@@ -47,7 +53,7 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	plt.xticks(range(0,10001,2000), fontsize = 18)
 	plt.yticks( fontsize = 20)
 	plt.legend(loc = "upper left", prop={'size': 14})
-	plt.savefig("%s%s_%s_perf.pdf" % (plotsDir, dateStr, fname), bbox_inches='tight')
+	plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')
@@ -67,7 +73,7 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	plt.yticks(np.arange(0,1.5,0.5), fontsize = 20)
 	plt.ylabel("DRAM Bw (GB/s)", fontsize = 24)
 	plt.legend(loc = "lower right", prop={'size': 14})
-	plt.savefig("%s%s_%s_dram.pdf" % (plotsDir, dateStr, fname) , bbox_inches='tight')
+	plt.savefig("%s%s_%s_r%s_dram.pdf" % (plotsDir, dateStr, fname, runs) , bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')
