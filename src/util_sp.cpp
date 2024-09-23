@@ -228,7 +228,9 @@ int rand_sparse(float* mat, int r, int c, float sparsity) {
 	return nz;	
 }
 
+// we could write a method here that generates a generic type of sparsity pattern where it can be argued that the pattern is the same across different sparsities
 
+// we could write a new method here that imports sparsity pattern matrices of some size 
 
 
 // randomized sparse Normal(0,1) matrix with sparsity % of values determined by sigma (std dev)
@@ -245,3 +247,4 @@ void rand_sparse_gaussian(float* mat, int r, int c, float mu, float sigma) {
 	}	
 	printf("nnz = %d\n", nnz);
 }
+
