@@ -252,7 +252,9 @@ double mat_to_csr_file(float* A, int M, int K, char* fname) {
 
 	clock_gettime(CLOCK_REALTIME, &start);
 
+	// same full size as A & does not change size according to density ?
 	float* vals = (float*) malloc(M * K * sizeof(float));
+	// same full size as A & does not change size according to density ?
 	int* colind = (int*) malloc(M * K * sizeof(int));
 	int* rowptr = (int*) malloc((M+1) * sizeof(int));
 	rowptr[0] = 0;
@@ -262,8 +264,9 @@ double mat_to_csr_file(float* A, int M, int K, char* fname) {
 
 	for(int i = 0; i < M; i++) {
 		for(int j = 0; j < K; j++) {
-			// float tmp = A[i*K + j]; // assumes A stored row-major
-			float tmp = A[i + j*M]; // assumes A stored col-major
+			// JONAS switched these 24/09/24
+			float tmp = A[i*K + j]; // assumes A stored row-major
+			// float tmp = A[i + j*M]; // assumes A stored col-major
 			if(tmp != 0) {
 				vals[nz] = tmp;
 				colind[nz] = j;
