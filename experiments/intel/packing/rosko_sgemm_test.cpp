@@ -28,9 +28,9 @@ int main( int argc, char** argv ) {
 	struct timespec start, end;
 	long seconds, nanoseconds;
 	float density;
-	struct stat buffer;
 	enum sched sch = KMN;
-	csr_t* csr;
+	// struct stat buffer;
+	// csr_t* csr;
 
 	M = atoi(argv[1]);
 	K = atoi(argv[2]);
@@ -44,13 +44,13 @@ int main( int argc, char** argv ) {
 
 	printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, runs = %d\n", M,K,N,p, ((float) sp) / 100.0, runs);
 
-	// preparations/setup
-	float* A = (float*) malloc(M * K * sizeof( float ));
-    srand(time(NULL));
-	nz = rand_sparse(A, M, K, ((float) sp) / 100.0);
-	density = ((float) nz) / ((float) (((float) M) * ((float) K)));
-	cake_cntx_t* cake_cntx = cake_query_cntx();
-	update_mr_nr(cake_cntx, 30, 128);
+	// // preparations/setup
+	// float* A = (float*) malloc(M * K * sizeof( float ));
+    // srand(time(NULL));
+	// nz = rand_sparse(A, M, K, ((float) sp) / 100.0);
+	// density = ((float) nz) / ((float) (((float) M) * ((float) K)));
+	// cake_cntx_t* cake_cntx = cake_query_cntx();
+	// update_mr_nr(cake_cntx, 30, 128);
 
 
 
@@ -59,6 +59,18 @@ int main( int argc, char** argv ) {
 	double csr_times[runs], csr_bws[runs], rosko_bws[runs], rosko_times[runs];
 
 	for (int i = 0; i < runs; i++) {
+
+		// declarations from top
+		struct stat buffer;
+		csr_t* csr;
+
+		// preparations/setup
+		float* A = (float*) malloc(M * K * sizeof( float ));
+		srand(time(NULL));
+		nz = rand_sparse(A, M, K, ((float) sp) / 100.0);
+		density = ((float) nz) / ((float) (((float) M) * ((float) K)));
+		cake_cntx_t* cake_cntx = cake_query_cntx();
+		update_mr_nr(cake_cntx, 30, 128);
 
 		// measure MKL-CSR packing DRAM bw
 		csr_times[i] = mat_to_csr_file(A, M, K, argv[5]);
@@ -102,6 +114,10 @@ int main( int argc, char** argv ) {
 		free(A_p);
 		free(sp_pack);
 		free(x);
+
+		// fordi det er kopieret ind i loopet
+		free_csr(csr);
+		free(A);
 	}
 
 	// double csr_time 	= calculate_median(csr_times, runs);
@@ -131,9 +147,10 @@ int main( int argc, char** argv ) {
     fprintf(fp, "mkl time,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,csr_time,runs);
 
     fclose(fp);
-	
-	free_csr(csr);
-	free(A);
+
+	// fordi jeg har kopieret det ind i loopet	
+	// free_csr(csr);
+	// free(A);
 
 	return 0;
 
