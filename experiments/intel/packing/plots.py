@@ -24,7 +24,8 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	# N = range(768+1024,9985,512)
 	# MAYA this range does not comply with the range on N in run.sh
 	# N = range(256,9985,512)
-	N = range(256, 10241, 512)
+	# N = range(256, 10241, 512) #this one
+	N = range(200, 10000, 200) 
 	dft = pandas.read_csv('result_pack')
 	runs = dft['runs'].iloc[0]
 

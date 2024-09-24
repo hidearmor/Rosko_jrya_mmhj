@@ -34,7 +34,7 @@ fi
 # echo "algo,store,M,K,N,sp,bw" >> result_pack
 echo "algo,store,M,K,N,sp,bw,runs" >> result_pack
 
-declare -i runs=10
+declare -i runs=3
 echo "runs $runs"
 
 # exit;
@@ -43,7 +43,8 @@ echo "runs $runs"
 for i in 80 87 95 # this one
 # for i in 80 87
 do
-	for n in {256..10240..512} # this one
+	# for n in {256..10240..512} # this one
+	for n in {200..10000..200}
 	# for n in {256..2533..512}
 	do
 		#  it uses only 1 core
