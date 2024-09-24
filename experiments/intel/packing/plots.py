@@ -55,6 +55,31 @@ def plot_rosko_vs_intel_pack(fname = 'rosko_vs_intel_pack'):
 	plt.clf()
 	plt.close('all')
 	#
+
+	# JONAS added space plot
+	plt.figure(figsize = (6,4))
+	for i in range(len(sparsity)):
+		q = (dft[(dft['algo'] == 'mkl bytes') & (dft['sp'] == sparsity[i]) & (dft['store'] == 0)]['bytes'].values \
+		+ dft[(dft['algo'] == 'mkl bytes') & (dft['sp'] == sparsity[i]) & (dft['store'] == 1)]['bytes'].values) / 2.0
+		plt.plot(N, q, label = labels[i*2], marker = markers[i], color = colors[0])
+		q = (dft[(dft['algo'] == 'rosko bytes') & (dft['sp'] == sparsity[i]) & (dft['store'] == 0)]['bytes'].values \
+		+ dft[(dft['algo'] == 'rosko bytes') & (dft['sp'] == sparsity[i]) & (dft['store'] == 1)]['bytes'].values) / 2.0
+		plt.plot(N, q, label = labels[i*2+1],  marker = markers[i], color = colors[3])
+	#
+	plt.ticklabel_format(useOffset=False, style='plain')
+	plt.title('(a) Packing Size in \nRosko vs MKL-CSR', fontsize = 24)
+	plt.xlabel("N", fontsize = 24)
+	plt.ylabel("Bytes", fontsize = 24)
+	plt.xticks(range(0,10001,2000), fontsize = 18)
+	plt.yticks( fontsize = 20)
+	plt.legend(loc = "upper left", prop={'size': 14})
+	plt.savefig("%s%s_%s_r%s_bytes.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
+	plt.show()
+	plt.clf()
+	plt.close('all')
+
+
+	#
 	plt.figure(figsize = (6,4))
 	for i in range(len(sparsity)):
 		q = (dft[(dft['algo'] == 'mkl bw') & (dft['sp'] == sparsity[i]) & (dft['store'] == 0)]['bw'].values \

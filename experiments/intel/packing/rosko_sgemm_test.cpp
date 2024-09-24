@@ -22,6 +22,11 @@ double calculate_mean(double* array, int runs)
     return std::accumulate( array, array + runs, 0.0) / (double)(runs);
 }
 
+double calculate_mean(int* array, int runs)
+{
+    return std::accumulate( array, array + runs, 0.0) / (double)(runs);
+}
+
 int main( int argc, char** argv ) {
 
 	int M, K, N, p, sp, nz, mr, nr, ntrials, store, runs;
@@ -57,6 +62,7 @@ int main( int argc, char** argv ) {
 	// --------------- NEW --------------------
 
 	double csr_times[runs], csr_bws[runs], rosko_bws[runs], rosko_times[runs];
+	int csr_bytes[runs], rosko_bytes[runs];
 
 	for (int i = 0; i < runs; i++) {
 
@@ -75,10 +81,10 @@ int main( int argc, char** argv ) {
 		// measure MKL-CSR packing DRAM bw
 		csr_times[i] = mat_to_csr_file(A, M, K, argv[5]);
 		stat(argv[5], &buffer);
-		int csr_bytes = buffer.st_size;
+		csr_bytes[i] = buffer.st_size;
 		csr = file_to_csr(argv[5]);
 		// printf("csr pack time: %f \n", csr_times[i]); 
-		// printf("csr bytes: %d \n", csr_bytes); 
+		// printf("csr bytes: %d \n", csr_bytes[i]); 
 
 		// measure Rosko packing DRAM bw
 		// is t his block supposed to be by itself ?
@@ -96,7 +102,7 @@ int main( int argc, char** argv ) {
 		nanoseconds = end.tv_nsec - start.tv_nsec;
 
 		// why M*K*4 here ?
-		csr_bws[i] = ((float) (csr_bytes + M*K*4)) / csr_times[i] / 1e9;
+		csr_bws[i] = ((float) (csr_bytes[i] + M*K*4)) / csr_times[i] / 1e9;
 
 		// here below TIME's are set/calculated 
 		rosko_times[i] = seconds + nanoseconds*1e-9;
@@ -106,10 +112,10 @@ int main( int argc, char** argv ) {
 		pack_A_csr_to_sp_k_first(csr, M, K, nz, p, sp_pack1, x, cake_cntx);
 		sp_pack_to_file(sp_pack1, argv[6]);
 		stat(argv[6], &buffer);
-		int rosko_bytes = buffer.st_size;
-		// printf("rosko bytes: %d \n", rosko_bytes); 
+		rosko_bytes[i] = buffer.st_size;
+		// printf("rosko bytes: %d \n", rosko_bytes[i]); 
 
-		rosko_bws[i] = ((float) (rosko_bytes + M*K*4)) / rosko_times[i] / 1e9;
+		rosko_bws[i] = ((float) (rosko_bytes[i] + M*K*4)) / rosko_times[i] / 1e9;
 
 		// free resources per run for cache
 		free_sp_pack(sp_pack1);
@@ -127,10 +133,12 @@ int main( int argc, char** argv ) {
 	// float csr_bw 		= calculate_median(csr_bws, runs);
 	// float rosko_bw 		= calculate_median(rosko_bws, runs);
 
-	double csr_time 	= calculate_mean(csr_times, runs);
-	double rosko_time 	= calculate_mean(rosko_times, runs);
-	float csr_bw 		= calculate_mean(csr_bws, runs);
-	float rosko_bw 		= calculate_mean(rosko_bws, runs);
+	double csr_time 		= calculate_mean(csr_times, runs);
+	double rosko_time 		= calculate_mean(rosko_times, runs);
+	float csr_bw 			= calculate_mean(csr_bws, runs);
+	float rosko_bw 			= calculate_mean(rosko_bws, runs);
+	float csr_bytes_agv		= calculate_mean(csr_bytes, runs); 
+	float rosko_bytes_agv	= calculate_mean(rosko_bytes, runs); 
 
 	printf("csr pack time: %f \n", csr_time); 
 	printf("rosko pack time median: %f \n", rosko_time);
@@ -147,6 +155,11 @@ int main( int argc, char** argv ) {
     fprintf(fp, "mkl bw,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,csr_bw,runs);
     fprintf(fp, "rosko time,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,rosko_time,runs);
     fprintf(fp, "mkl time,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,csr_time,runs);
+
+	// JONAS addition
+    fprintf(fp, "rosko bytes,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,rosko_bytes_agv,runs);
+    fprintf(fp, "mkl bytes,%d,%d,%d,%d,%d,%f,%d\n",store,M,K,N,sp,csr_bytes_agv,runs);
+
 
     fclose(fp);
 
