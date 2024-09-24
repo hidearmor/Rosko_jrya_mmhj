@@ -32,7 +32,7 @@ fi
 
 # result pack is created and gets headers
 # echo "algo,store,M,K,N,sp,bw" >> result_pack
-echo "algo,store,M,K,N,sp,bw,bytes,runs" >> result_pack
+echo "algo,store,M,K,N,sp,bw,runs" >> result_pack
 
 declare -i runs=10
 echo "runs $runs"
