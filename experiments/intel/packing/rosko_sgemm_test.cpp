@@ -82,23 +82,25 @@ int main( int argc, char** argv ) {
 
 		// measure Rosko packing DRAM bw
 		// is t his block supposed to be by itself ?
+		clock_gettime(CLOCK_REALTIME, &start); // Jonas this was moved
 		blk_dims_t* x = (blk_dims_t*) malloc(sizeof(blk_dims_t));
 		init_sparse_block_dims(M, N, K, p, x, cake_cntx, sch, NULL, density, 4, 0);
 		size_t A_sz = cake_sgemm_packed_A_size(M, K, p, x, cake_cntx, sch) / sizeof(float);
 		float* A_p = (float*) calloc(A_sz, sizeof(float));
 		sp_pack_t* sp_pack = (sp_pack_t*) malloc(sizeof(sp_pack_t));
 
-		clock_gettime(CLOCK_REALTIME, &start);
+		// clock_gettime(CLOCK_REALTIME, &start);
 		pack_A_sp_k_first(A, A_p, M, K, p, sp_pack, x, cake_cntx);
 		clock_gettime(CLOCK_REALTIME, &end);
 		seconds = end.tv_sec - start.tv_sec;
 		nanoseconds = end.tv_nsec - start.tv_nsec;
 
+		// why M*K*4 here ?
 		csr_bws[i] = ((float) (csr_bytes + M*K*4)) / csr_times[i] / 1e9;
 
 		// here below TIME's are set/calculated 
 		rosko_times[i] = seconds + nanoseconds*1e-9;
-		// printf("rosko pack time: %f \n", rosko_time); 
+		// printf("rosko pack time: %f \n", rosko_time);
 
 		sp_pack_t* sp_pack1 = malloc_sp_pack(M, K, nz, x, cake_cntx);
 		pack_A_csr_to_sp_k_first(csr, M, K, nz, p, sp_pack1, x, cake_cntx);
