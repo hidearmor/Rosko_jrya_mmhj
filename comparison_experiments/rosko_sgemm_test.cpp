@@ -52,6 +52,7 @@ int main( int argc, char** argv ) {
     // printf("alg = %d, flushsize = %d\n", alg, flushsz);
 
     for(int i = 0; i < (ntrials + warmup); i++) {
+	// for(int i = 0; i < (1); i++) {
 
         float* dirty = (float *) malloc(flushsz * sizeof(float));
         #pragma omp parallel for

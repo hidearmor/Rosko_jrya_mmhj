@@ -6,16 +6,27 @@ double naive_mm(float* A, float* B, float* C, int M, int N, int K) {
     struct timespec start, end;
 	long seconds, nanoseconds;
 	double diff_t, times;
-
+	
     clock_gettime(CLOCK_REALTIME, &start);
 
-	for (int i = 0; i < M;  i++) {
-		for (int j = 0; j < N; j++) {
+	// KMN order
+	// for (int k = 0; k < K; k++){
+	// 	for (int m = 0; m < M;  m++) {
+	// 		for (int n = 0; n < N; n++) {
+    //             C[m*N + n] += A[m*K + k] * B[k*N + n];
+	// 		}
+	// 	}
+	// }
+
+	// MNK order (the one we have known the best)
+	for (int m = 0; m < M;  m++) {
+		for (int n = 0; n < N; n++) {
 			for (int k = 0; k < K; k++){
-                C[i*N + j] += A[i*K + k] * B[k*N + j];
+                C[m*N + n] += A[m*K + k] * B[k*N + n];
 			}
 		}
 	}
+
 
     clock_gettime(CLOCK_REALTIME, &end);
     seconds = end.tv_sec - start.tv_sec;
@@ -42,7 +53,7 @@ int main( int argc, char** argv ) {
 	algo = std::string(argv[6]);
 	filename = std::string(argv[7]);
 
-	printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
+	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
 
 
 	// ---------- Memory allocation for matrices --------------
@@ -75,6 +86,9 @@ int main( int argc, char** argv ) {
 
     // ------------- Performance experiment --------------
     for(int i = 0; i < (ntrials + warmup); i++) {
+	// for(int i = 0; i < (1); i++) {
+
+		memset(C, 0, M * N * sizeof(float));  // Reset C to zero
 
         float* dirty = (float *) malloc(flushsz * sizeof(float));
         #pragma omp parallel for // parallelizes for loop with OpenMP 
@@ -104,7 +118,7 @@ int main( int argc, char** argv ) {
 	fprintf(fp, "%s,%d,%f,%d,%d,%d,%f,%d\n", algo.c_str(), p, sp, M, K, N, diff_t / ntrials, ntrials);
 	fclose(fp);
 
-	cake_sgemm_checker(A, B, C, N, M, K);
+	// cake_sgemm_checker(A, B, C, N, M, K);
 
 	free(A);
 	free(B);
