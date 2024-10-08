@@ -17,13 +17,14 @@ filename="results"
 
 echo "algo,p,sp,M,K,N,time,ntrials" >> $filename
 
-for algo in rosko;
-do 
-	for sp in 70 75 80 85 90 95 98 99;
-	do
-		./rosko_sgemm_test 1000 1000 1000 8 $sp 10 $algo $filename
-	done
+# algo might not be a relevenat parameter
+
+for sp in 70 75 80 85 90 95 98 99;
+do
+	./rosko_sgemm_test 1000 1000 1000 8 $sp 5 rosko $filename
+	./naive_mm_test 1000 1000 1000 $sp 5 naive $filename
 done
+
 
 
 

@@ -43,7 +43,6 @@ CFLAGS 	:= $(filter-out -std=c99, $(CFLAGS_tmp))
 
 
 
-
 # --- Targets/rules ------------------------------------------------------------
 
 all: $(TARGETS)
@@ -56,6 +55,7 @@ rosko_armv8: $(wildcard *.h) $(wildcard *.c)
 
 rosko_haswell: $(wildcard *.h) $(wildcard *.c)
 	g++ $(CFLAGS) rosko_sgemm_test.cpp $(LIBS) -o rosko_sgemm_test
+	g++ $(CFLAGS) naive_mm_test.cpp $(LIBS) -o naive_mm_test
 
 crisko_haswell: $(wildcard *.h) $(wildcard *.c)
 	g++ $(CFLAGS) crisko_sgemm_test.cpp $(LIBS) -o crisko_sgemm_test

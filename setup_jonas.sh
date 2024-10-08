@@ -1,7 +1,7 @@
 # Remove CAKE if it's there
 if [ -d "CAKE_on_CPU" ]; 
 then
-    sudo rm -rf CAKE_ON_CPU
+    sudo rm -rf CAKE_on_CPU
 else 
 	echo "Hehe"; 
 fi

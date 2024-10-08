@@ -1,10 +1,44 @@
 #include "rosko.h"
 #include <string>
 
+double naive_mm(float* A, float* B, float* C, int M, int N, int K) {
+
+    struct timespec start, end;
+	long seconds, nanoseconds;
+	double diff_t, times;
+	
+    clock_gettime(CLOCK_REALTIME, &start);
+
+	// KMN order
+	// for (int k = 0; k < K; k++){
+	// 	for (int m = 0; m < M;  m++) {
+	// 		for (int n = 0; n < N; n++) {
+    //             C[m*N + n] += A[m*K + k] * B[k*N + n];
+	// 		}
+	// 	}
+	// }
+
+	// MNK order (the one we have known the best)
+	for (int m = 0; m < M;  m++) {
+		for (int n = 0; n < N; n++) {
+			for (int k = 0; k < K; k++){
+                C[m*N + n] += A[m*K + k] * B[k*N + n];
+			}
+		}
+	}
+
+
+    clock_gettime(CLOCK_REALTIME, &end);
+    seconds = end.tv_sec - start.tv_sec;
+    nanoseconds = end.tv_nsec - start.tv_nsec;
+    diff_t = seconds + nanoseconds*1e-9;
+    return diff_t; 
+}
+
 int main( int argc, char** argv ) {
 
 // exit(1);
-	int M, K, N, p, nz, mr, nr, ntrials, alg, warmup = 10; // alg is only for rosko use
+	int M, K, N, p, nz, ntrials, alg, warmup = 10; // alg is only for rosko use
 	struct timespec start, end;
 	double diff_t;
 	float density, sp;
@@ -13,11 +47,11 @@ int main( int argc, char** argv ) {
 	M = atoi(argv[1]); 
 	K = atoi(argv[2]);
 	N = atoi(argv[3]);
-	p = atoi(argv[4]);
-	sp = atof(argv[5]);
-	ntrials = atoi(argv[6]);
-	algo = std::string(argv[7]);
-	filename = std::string(argv[8]);
+	p = 1;
+	sp = atof(argv[4]);
+	ntrials = atoi(argv[5]);
+	algo = std::string(argv[6]);
+	filename = std::string(argv[7]);
 
 	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
 
@@ -32,10 +66,10 @@ int main( int argc, char** argv ) {
 	rand_sparse(A, M, K, ((float) sp) / 100.0); // init A with random uniform sparsity
 	rand_init(B, K, N); // init B with random nnz
 
-	// --------- Rosko init (begin) -------------------
+	// --------- Naive init -------------------
 	density = (100.0 - sp) / 100.0;
 
-	cake_cntx_t* cake_cntx = cake_query_cntx();
+	cake_cntx_t* cake_cntx = cake_query_cntx(); // just to have stats on this computer
 
 	char fname[50];
 	snprintf(fname, sizeof(fname), "%s", filename.c_str());
@@ -47,15 +81,17 @@ int main( int argc, char** argv ) {
     int flushsz = 2*cake_cntx->L3 / sizeof(float);
     diff_t = 0.0;
 
-	// --------- Rosko init (end) -------------------
     
     // printf("alg = %d, flushsize = %d\n", alg, flushsz);
 
+    // ------------- Performance experiment --------------
     for(int i = 0; i < (ntrials + warmup); i++) {
 	// for(int i = 0; i < (1); i++) {
 
+		memset(C, 0, M * N * sizeof(float));  // Reset C to zero
+
         float* dirty = (float *) malloc(flushsz * sizeof(float));
-        #pragma omp parallel for
+        #pragma omp parallel for // parallelizes for loop with OpenMP 
         for (int dirt = 0; dirt < flushsz; dirt++){
             dirty[dirt] += dirt%100;
             tttmp[dirt%18] += dirty[dirt];
@@ -67,10 +103,10 @@ int main( int argc, char** argv ) {
 
 		
 		if(i < warmup) {
-			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
+			float y = naive_mm(A, B, C, M, N, K);
 			// printf("sss %f\n", y);
 		} else {
-			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
+			float y = naive_mm(A, B, C, M, N, K);
 			// printf("sss %f\n", y);
 			diff_t += y;
 		}
@@ -84,19 +120,10 @@ int main( int argc, char** argv ) {
 
 	// cake_sgemm_checker(A, B, C, N, M, K);
 
-	free(A); 
+	free(A);
 	free(B);
 	free(C);
 	free(cake_cntx);
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
