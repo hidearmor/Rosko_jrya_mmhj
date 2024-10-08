@@ -265,8 +265,8 @@ double mat_to_csr_file(float* A, int M, int K, char* fname) {
 	for(int i = 0; i < M; i++) {
 		for(int j = 0; j < K; j++) {
 			// JONAS switched these 24/09/24
-			float tmp = A[i*K + j]; // assumes A stored row-major
-			// float tmp = A[i + j*M]; // assumes A stored col-major
+			// float tmp = A[i*K + j]; // assumes A stored row-major
+			float tmp = A[i + j*M]; // assumes A stored col-major
 			if(tmp != 0) {
 				vals[nz] = tmp;
 				colind[nz] = j;
