@@ -49,6 +49,7 @@ for sp in 70 75 80 85 90 95 98 99;
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp 5 rosko $FILE
 	./naive_mm_test 	$n $n $n $sp 5 naive $FILE
+	# python call here
 done
 
 ### PLOTS PART ####
