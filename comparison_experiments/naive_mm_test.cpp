@@ -25,6 +25,15 @@ double naive_mm(float* A, float* B, float* C, int M, int N, int K) {
                 C[m*N + n] += A[m*K + k] * B[k*N + n];
 			}
 		}
+		// Check elapsed time after each outer loop iteration
+        clock_gettime(CLOCK_REALTIME, &end);
+        seconds = end.tv_sec - start.tv_sec;
+        nanoseconds = end.tv_nsec - start.tv_nsec;
+        diff_t = seconds + nanoseconds * 1e-9;
+
+        if (diff_t > 40.0) {
+            return -1.0;  // Return -1.0 if time exceeds 40 seconds
+        }
 	}
 
 
