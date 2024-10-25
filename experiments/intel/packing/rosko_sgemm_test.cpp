@@ -29,9 +29,11 @@ double calculate_mean(int* array, int runs)
 
 int main( int argc, char** argv ) {
 
-	int M, K, N, p, sp, nz, mr, nr, ntrials, store, runs;
+	int M, K, N, p, sp, nz, mr, nr, ntrials, store, runs, warmup = 3; // why segmentation fault at 4 and up? I think I have to free up the dirty space
 	struct timespec start, end;
 	long seconds, nanoseconds;
+	int  rosko_byte_i, csr_byte_i;
+	double rosko_time_i, rosko_bw_i, csr_time_i, csr_bw_i;
 	float density;
 	enum sched sch = KMN;
 	// struct stat buffer;
@@ -64,7 +66,8 @@ int main( int argc, char** argv ) {
 	double csr_times[runs], csr_bws[runs], rosko_bws[runs], rosko_times[runs];
 	int csr_bytes[runs], rosko_bytes[runs];
 
-	for (int i = 0; i < runs; i++) {
+	// for (int i = 0; i < (runs); i++) {
+	for (int i = 0; i < (runs + warmup); i++) {
 
 		// declarations from top
 		struct stat buffer;
@@ -79,9 +82,11 @@ int main( int argc, char** argv ) {
 		update_mr_nr(cake_cntx, 30, 128);
 
 		// measure MKL-CSR packing DRAM bw
-		csr_times[i] = mat_to_csr_file(A, M, K, argv[5]);
+		// csr_times[i] = mat_to_csr_file(A, M, K, argv[5]);
+		csr_time_i = mat_to_csr_file(A, M, K, argv[5]);
 		stat(argv[5], &buffer);
-		csr_bytes[i] = buffer.st_size;
+		// csr_bytes[i] = buffer.st_size;
+		csr_byte_i = buffer.st_size;
 		csr = file_to_csr(argv[5]);
 		// printf("csr pack time: %f \n", csr_times[i]); 
 		// printf("csr bytes: %d \n", csr_bytes[i]); 
@@ -102,20 +107,34 @@ int main( int argc, char** argv ) {
 		nanoseconds = end.tv_nsec - start.tv_nsec;
 
 		// why M*K*4 here ?
-		csr_bws[i] = ((float) (csr_bytes[i] + M*K*4)) / csr_times[i] / 1e9;
+		// csr_bws[i] = ((float) (csr_bytes[i] + M*K*4)) / csr_times[i] / 1e9;
+		csr_bw_i = ((float) (csr_byte_i + M*K*4)) / csr_time_i / 1e9;
 
 		// here below TIME's are set/calculated 
-		rosko_times[i] = seconds + nanoseconds*1e-9;
+		// rosko_times[i] = seconds + nanoseconds*1e-9;
+		rosko_time_i = seconds + nanoseconds*1e-9;
 		// printf("rosko pack time: %f \n", rosko_time);
 
 		sp_pack_t* sp_pack1 = malloc_sp_pack(M, K, nz, x, cake_cntx);
 		pack_A_csr_to_sp_k_first(csr, M, K, nz, p, sp_pack1, x, cake_cntx);
 		sp_pack_to_file(sp_pack1, argv[6]);
 		stat(argv[6], &buffer);
-		rosko_bytes[i] = buffer.st_size;
+		// rosko_bytes[i] = buffer.st_size;
+		rosko_byte_i = buffer.st_size;
 		// printf("rosko bytes: %d \n", rosko_bytes[i]); 
 
-		rosko_bws[i] = ((float) (rosko_bytes[i] + M*K*4)) / rosko_times[i] / 1e9;
+		// rosko_bws[i] = ((float) (rosko_bytes[i] + M*K*4)) / rosko_times[i] / 1e9;
+		rosko_bw_i = ((float) (rosko_byte_i + M*K*4)) / rosko_time_i / 1e9;
+		
+		if (i >= warmup) { // don't count warmup runs in the recorded results
+			rosko_times[i] = rosko_time_i;
+			rosko_bws[i] = rosko_bw_i;
+			rosko_bytes[i] = rosko_byte_i;
+
+			csr_times[i] = csr_time_i;
+			csr_bws[i] = csr_bw_i;
+			csr_bytes[i] = csr_byte_i;
+		}
 
 		// free resources per run for cache
 		free_sp_pack(sp_pack1);
@@ -127,7 +146,7 @@ int main( int argc, char** argv ) {
 		free_csr(csr);
 		free(A);
 	}
-
+	
 	// double csr_time 	= calculate_median(csr_times, runs);
 	// double rosko_time 	= calculate_median(rosko_times, runs);
 	// float csr_bw 		= calculate_median(csr_bws, runs);

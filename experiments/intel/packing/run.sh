@@ -44,8 +44,9 @@ for i in 80 87 95 # this one
 # for i in 80 87
 do
 	# for n in {256..10240..512} # this one
-	for n in {512..10497..512}
-	# for n in {256..2533..512}
+	# for n in {512..10497..512} # this one is the weird one
+	# for n in {512..2048..512}
+	for n in {256..2533..512}
 	do
 		#  it uses only 1 core
 		./rosko_sgemm_test $n $n 1 $i csr_file rosko_file 0 $runs;
