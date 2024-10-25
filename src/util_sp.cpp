@@ -1,4 +1,10 @@
 #include "rosko.h"
+#include <iostream>
+#include <vector>
+#include <algorithm>  // for std::random_shuffle or std::shuffle
+#include <cstdlib>    // for rand()
+#include <ctime>      // for seeding rand
+#include <random>     // for std::shuffle (modern C++)
 
 
 int run_tests_sparse() {
@@ -228,9 +234,62 @@ int rand_sparse(float* mat, int r, int c, float sparsity) {
 	return nz;	
 }
 
-// we could write a method here that generates a generic type of sparsity pattern where it can be argued that the pattern is the same across different sparsities
+// Sparse matrix with row pattern generator
+// Either sparsity should be given as argument or num_nnz_rows (call with -1 to diaregard a parameter). 
+// returns the actual sparsity of matrix A from 0.0-1.0
+float row_pattern_sparse(float* mat, int r, int c, float sparsity, int num_nnz_rows) {
 
-// we could write a new method here that imports sparsity pattern matrices of some size 
+	// Calculate number of non-zero rows based on sparsity if num_row is not provided
+    if (num_nnz_rows >= 0) { // we have a num_nnz_rows argument
+        if (num_nnz_rows > r || num_nnz_rows < 0) {
+            printf("num_nnz_rows cannot exceed the total number of rows or be negative");
+            return -1;
+        }
+
+    } else { // we don't have a num_nnz_rows argument but must have a sparsity argument
+        if (sparsity < 0.0f || sparsity > 1.0f) {
+            printf("Sparsity must be between 0 and 1");
+            return -1;
+        }
+        // Calculate number of non-zero rows based on sparsity
+        num_nnz_rows = (int) round((1.0f - sparsity) * r);
+    }
+		float actual_sparsity = 1.0f - ((float) num_nnz_rows / (float) r); 
+
+
+    int nz = 0;  // count of non-zero entries
+
+    // Zero out the matrix
+    for (int i = 0; i < r * c; i++) {
+        mat[i] = 0;
+    }
+
+    // Create a vector of row indices
+    std::vector<int> row_indices(r);
+    for (int i = 0; i < r; i++) {
+        row_indices[i] = i;
+    }
+
+    // Shuffle the vector of row indices (C++11 or later)
+    std::random_device rd;   // Seed for randomness
+    std::mt19937 g(rd());    // Mersenne Twister engine for randomness
+    std::shuffle(row_indices.begin(), row_indices.end(), g);  // Modern C++ shuffle
+
+    
+    // Pick the first nnz row in the shuffled rows and fill them with nnz values
+    for (int i = 0; i < num_nnz_rows; i++) {
+        int row = row_indices[i];  // Select a unique row from the shuffled list
+
+        // Fill the selected row with random values
+        for (int j = 0; j < c; j++) {
+            float rand_val = (float) rand() / (float) RAND_MAX;
+            mat[row * c + j] = rand_val * 2.0f - 1.0f;  // Random value between -1 and 1
+            nz++;
+        }
+    }
+
+    return actual_sparsity;  // Return the number of non-zero elements
+}
 
 
 // randomized sparse Normal(0,1) matrix with sparsity % of values determined by sigma (std dev)
