@@ -31,7 +31,9 @@ double naive_mm(float* A, float* B, float* C, int M, int N, int K) {
         nanoseconds = end.tv_nsec - start.tv_nsec;
         diff_t = seconds + nanoseconds * 1e-9;
 
-        if (diff_t > 40.0) {
+		float limit = 40.0;
+
+        if (diff_t > limit) {
             return -1.0;  // Return -1.0 if time exceeds 40 seconds
         }
 	}
@@ -110,14 +112,19 @@ int main( int argc, char** argv ) {
             ressss+= tttmp[ii];
         }
 
-		
+		float y = 0.0;
 		if(i < warmup) {
-			float y = naive_mm(A, B, C, M, N, K);
-			// printf("sss %f\n", y);
+			y = naive_mm(A, B, C, M, N, K);
 		} else {
-			float y = naive_mm(A, B, C, M, N, K);
+			y = naive_mm(A, B, C, M, N, K);
 			// printf("sss %f\n", y);
 			diff_t += y;
+		}
+
+		// break if time limit exeeced
+		if (y == -1.0) {
+			diff_t = y*ntrials;
+			break;
 		}
 
         free(dirty);
