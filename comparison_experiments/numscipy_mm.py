@@ -61,7 +61,7 @@ def SparseDenseMM(N, d_org, format):
     return  end-start
 
 formats = ['csr', 'bsr', 'coo', 'csc', 'dia']
-formats = ['csr', 'bsr', 'dia']
+formats = ['csr', 'dia']
 headliner = 'format, N, density, time, runs, diagonals'
 file = open('format_horse_race.txt', 'a')
 file.write(headliner)
@@ -69,8 +69,8 @@ print(headliner)
 for d in [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]:
     for format in formats:
         res = 0
-        runs = 5
-        N = 4096
+        runs = 4
+        N = 4096*2
         # N = 2048
         # d = 0.08
         diags, dens = diagonals_with_density(N, d)
