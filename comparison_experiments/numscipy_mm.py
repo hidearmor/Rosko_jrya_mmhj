@@ -66,8 +66,8 @@ headliner = 'format, N, density, time, runs, diagonals'
 file = open('format_horse_race.txt', 'a')
 file.write(headliner)
 print(headliner)
-for format in formats:
-    for d in [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]:
+for d in [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]:
+    for format in formats:
         res = 0
         runs = 5
         N = 4096
