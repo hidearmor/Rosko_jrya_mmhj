@@ -41,6 +41,7 @@ echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
 
 declare -i trials=10
 declare -i warmups=10
+declare -i n=8192*2
 declare -i cores=10
 type="random" # options: random, diagonal
 
@@ -49,12 +50,9 @@ type="random" # options: random, diagonal
 # for sp in 70 75 80 85 90 95 98 99;
 for sp in 60 70 80 90 95 98 99;
 do
-	for n in {256..10500..512}
-	do
-		./rosko_sgemm_test 	$n $n $n $cores $sp 5 rosko $FILE
-		./naive_mm_test 	$n $n $n $sp $cores naive $FILE
-		python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python $FILE
-	done
+	./rosko_sgemm_test 	$n $n $n $cores $sp 5 rosko $FILE
+	./naive_mm_test 	$n $n $n $sp $cores naive $FILE
+	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python $FILE
 done
 
 # exit 0 # exit without errors
