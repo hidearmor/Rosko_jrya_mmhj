@@ -39,17 +39,17 @@ fi
 
 echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
 
-declare -i trials=2
-declare -i warmups=2
+declare -i trials=10
+declare -i warmups=10
 declare -i cores=10
 type="random" # options: random, diagonal
 
 # algo might not be a relevenat parameter
 
 # for sp in 70 75 80 85 90 95 98 99;
-for sp in 60 70 80 90 95 99;
+for sp in 60 70 80 90 95 98 99;
 do
-	for n in {256..1024..512}
+	for n in {256..10500..512}
 	do
 		./rosko_sgemm_test 	$n $n $n $cores $sp 5 rosko $FILE
 		./naive_mm_test 	$n $n $n $sp $cores naive $FILE
@@ -57,7 +57,7 @@ do
 	done
 done
 
-exit 0 # exit without errors
+# exit 0 # exit without errors
 
 ### PLOTS PART ####
 
@@ -72,7 +72,7 @@ path=$(echo "$output" | sed -n '1p')
 time=$(echo "$output" | sed -n '2p')
 underscore="_"
 
-cp $FILE $path$time$underscore$FILE
+cp $FILE $path$time$underscore$FILE$underscore$type
 
 # python3 plots.py
 
