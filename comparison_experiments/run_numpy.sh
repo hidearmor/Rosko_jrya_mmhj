@@ -52,7 +52,6 @@ for sp in 60 70 80 90 95 98 99;
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
 	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python_sparse $FILE
-	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python_dense $FILE
 done
 
 # exit 0 # exit without errors
