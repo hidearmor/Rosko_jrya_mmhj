@@ -43,7 +43,7 @@ declare -i trials=10
 declare -i warmups=10
 declare -i n=5000
 declare -i cores=10
-type="random" # options: random, diagonal
+type="random" # options: random_csr, random_arr, diagonal
 
 # algo might not be a relevenat parameter
 
@@ -51,10 +51,11 @@ type="random" # options: random, diagonal
 for sp in 60 70 80 90 95 98 99;
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
-	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python_sparse $FILE
+	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_csr numpy_csr $FILE
+	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_arr numpy_arr $FILE
 done
 
-# exit 0 # exit without errors
+exit 0 # exit without errors
 
 ### PLOTS PART ####
 

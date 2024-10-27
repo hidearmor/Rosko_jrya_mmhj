@@ -48,8 +48,11 @@ def SparseDenseMM(N, d, type):
         diags, d = diagonals_with_density(N, d)
         data = rng.random((len(diags), N))
         sparse_matrix = scipy.sparse.dia_array((data, diags), shape=(N, N))
-    else:
+    elif type == 'random_csr':
         sparse_matrix = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr')
+    elif type == 'random_arr':
+        sparse_matrix = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr').toarray()
+    else: return -1.0, -1.0
 
     start = time.time()
     result = sparse_matrix @ dense_matrix
