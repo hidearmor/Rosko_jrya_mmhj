@@ -55,7 +55,7 @@ do
 	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_arr numpy_arr $FILE
 done
 
-exit 0 # exit without errors
+# exit 0 # exit without errors
 
 ### PLOTS PART ####
 
