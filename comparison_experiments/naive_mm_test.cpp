@@ -31,11 +31,11 @@ double naive_mm(float* A, float* B, float* C, int M, int N, int K) {
         nanoseconds = end.tv_nsec - start.tv_nsec;
         diff_t = seconds + nanoseconds * 1e-9;
 
-		float limit = 40.0;
+		// float limit = 40.0;
 
-        if (diff_t > limit) {
-            return -1.0;  // Return -1.0 if time exceeds 40 seconds
-        }
+        // if (diff_t > limit) {
+        //     return -1.0;  // Return -1.0 if time exceeds 40 seconds
+        // }
 	}
 
 

@@ -26,7 +26,7 @@ make;
 # filename="results" #Mayas imp
 
 # check if results exists and if it does, move it
-FILE="results_comp"
+FILE="results_comp_numpy"
 
 # Check if the results file already exists
 if [ -f "$FILE" ]; then
@@ -41,7 +41,7 @@ echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
 
 declare -i trials=10
 declare -i warmups=10
-declare -i n=2000
+declare -i n=6000
 declare -i cores=10
 type="random" # options: random, diagonal
 
@@ -50,12 +50,11 @@ type="random" # options: random, diagonal
 # for sp in 70 75 80 85 90 95 98 99;
 for sp in 60 70 80 90 95 98 99;
 do
-	./rosko_sgemm_test 	$n $n $n $cores $sp $trials rosko $FILE
-	./naive_mm_test 	$n $n $n $sp $cores naive $FILE
+	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
 	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python $FILE
 done
 
-exit 0 # exit without errors
+# exit 0 # exit without errors
 
 ### PLOTS PART ####
 
