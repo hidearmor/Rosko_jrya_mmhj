@@ -49,7 +49,7 @@ double naive_mm(float* A, float* B, float* C, int M, int N, int K) {
 int main( int argc, char** argv ) {
 
 // exit(1);
-	int M, K, N, p, nz, ntrials, alg, warmup = 10; // alg is only for rosko use
+	int M, K, N, p, nz, ntrials, alg, warmup; // alg is only for rosko use
 	struct timespec start, end;
 	double diff_t;
 	float density, sp;
@@ -61,8 +61,9 @@ int main( int argc, char** argv ) {
 	p = 1;
 	sp = atof(argv[4]);
 	ntrials = atoi(argv[5]);
-	algo = std::string(argv[6]);
-	filename = std::string(argv[7]);
+	warmup = atoi(argv[6]);
+	algo = std::string(argv[7]);
+	filename = std::string(argv[8]);
 
 	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
 

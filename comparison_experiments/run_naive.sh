@@ -50,8 +50,8 @@ type="random" # options: random, diagonal
 # for sp in 70 75 80 85 90 95 98 99;
 for sp in 60 70 80 90 95 98 99;
 do
-	./rosko_sgemm_test 	$n $n $n $cores $sp $trials rosko $FILE
-	./naive_mm_test 	$n $n $n $sp $cores naive $FILE
+	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
+	./naive_mm_test 	$n $n $n $sp $trials $warmups naive $FILE
 done
 
 # exit 0 # exit without errors
