@@ -75,6 +75,6 @@ cp $FILE $path$time$underscore$FILE$underscore$type
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash.txt"
-echo "$commit_hash" > $path$time$underscore$logName
+echo "$commit_hash" > $path$time$underscore$logName$underscore$FILE
 
 #####################

@@ -41,7 +41,7 @@ echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
 
 declare -i trials=10
 declare -i warmups=10
-declare -i n=6000
+declare -i n=5000
 declare -i cores=10
 type="random" # options: random, diagonal
 
@@ -51,7 +51,8 @@ type="random" # options: random, diagonal
 for sp in 60 70 80 90 95 98 99;
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
-	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python $FILE
+	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python_sparse $FILE
+	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $type python_dense $FILE
 done
 
 # exit 0 # exit without errors
@@ -75,6 +76,6 @@ cp $FILE $path$time$underscore$FILE$underscore$type
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash.txt"
-echo "$commit_hash" > $path$time$underscore$logName
+echo "$commit_hash" > $path$time$underscore$logName$underscore$FILE
 
 #####################
