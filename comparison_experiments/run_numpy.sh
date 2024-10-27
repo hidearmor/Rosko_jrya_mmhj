@@ -48,11 +48,12 @@ type="random" # options: random_csr, random_arr, diagonal
 # algo might not be a relevenat parameter
 
 # for sp in 70 75 80 85 90 95 98 99;
-for sp in 60 70 80 90 95 98 99;
+# for sp in 60 70 80 90 95 98 99;
+for sp in 99 99.5 99.8 99.9;
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
 	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_csr numpy_csr $FILE
-	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_arr numpy_arr $FILE
+	# python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_arr numpy_arr $FILE
 done
 
 # exit 0 # exit without errors
