@@ -41,7 +41,7 @@ echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
 
 declare -i trials=10
 declare -i warmups=10
-declare -i n=1024
+declare -i n=2048
 declare -i cores=10
 type="random" # options: random, diagonal
 
