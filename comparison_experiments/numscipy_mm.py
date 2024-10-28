@@ -54,19 +54,19 @@ def SparseDenseMM(N, d, type):
         sparse_matrix = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr').toarray()
     else: return -1.0, -1.0
 
-    start = time.time()
+    start = time.perf_counter()
     result = sparse_matrix @ dense_matrix
-    end = time.time()
+    end = time.perf_counter()
 
     return  end-start, result
 
-def DenseMM(N, M, K):
-    matrix_A = np.random.rand(N,K)
-    matrix_B = np.random.rand(K,M)
+def DenseMM(M, N, K):
+    matrix_A = np.random.rand(M,K)
+    matrix_B = np.random.rand(K,N)
 
-    start = time.time()
-    result = matrix_B @ matrix_A
-    end = time.time()
+    start = time.perf_counter()
+    result = matrix_A @ matrix_B
+    end = time.perf_counter()
 
     return  end-start, result
 
@@ -77,21 +77,27 @@ def main(N, M, K, p, sp_raw, trials, warmups, type, algo, filename):
     d = 1.0-sp
     res_total = 0.0
 
+    if type == 'row_pattern':
+        M_temp = round((1.0 - sp) * M)
+        sp = 1.0 - (M_temp / M)
+        M = M_temp
+
     for i in range(warmups):
-        (type == 'dense') if DenseMM(N, M, K) else SparseDenseMM(N, N, N, d)
+        (type == 'dense' or type == 'row_pattern') if DenseMM(M, N, K) else SparseDenseMM(N, d, type)
 
     for i in range(trials):
         res_part = 0.0
-        if type == 'dense':
-            res_part, _ = DenseMM(N, M, K)
+        if type == 'dense' or type == 'row_pattern':
+            res_part, _ = DenseMM(M, N, K)
         else:
             res_part, _ = SparseDenseMM(N, d, type)
         res_total += res_part
     
     avg = round(res_total / trials, 6)
     file = open(filename, 'a')
-    print(f'{algo},{p},{sp_raw},{M},{K},{N},{avg},{trials}')
-    file.write(f'{algo},{p},{sp_raw},{M},{K},{N},{avg},{trials}')
+    sp_print = round(sp*100, 2)
+    print(f'{algo},{p},{sp_print},{M},{K},{N},{avg},{trials}')
+    file.write(f'{algo},{p},{sp_print},{M},{K},{N},{avg},{trials}')
     file.write('\n')
 
 if __name__ == "__main__":
