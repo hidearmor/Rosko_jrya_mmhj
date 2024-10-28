@@ -12,7 +12,7 @@ from matplotlib import ticker as mticker
 
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
+# from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 	
 
 def plot_comparison(title, fname = "rosko_comp"):
@@ -21,11 +21,11 @@ def plot_comparison(title, fname = "rosko_comp"):
 	colors = ['b','g','k','r','r']	
 	# labels = ['Rosko', 'CSR-Numpy', 'Array-Numpy', 'Naive']
 	labels = ['Rosko', 'Array-Numpy']
-    # algos = ['rosko', 'csr_numpy', 'arr_numpy']
-	algos = ['rosko', 'arr_numpy']
+    # algos = ['rosko', 'numpy_csr', 'numpy_arr']
+	algos = ['rosko', 'numpy_arr']
 	sparsities = [60, 70, 80, 90, 95, 98, 99]
 	# sparsity = [99, 99.5, 99.8, 99.9]
-	results_fname = 'results_comp_numpy_random'
+	results_fname = 'results_comp_numpy_random_sample'
 	dft = pandas.read_csv(results_fname)
 	# runs = dft['runs'].iloc[0]
 
@@ -42,7 +42,7 @@ def plot_comparison(title, fname = "rosko_comp"):
 		
 	
 	plt.ticklabel_format(useOffset=False, style='plain')
-	plt.title('SpMM runtime at various sparsities on Intel i5,\nusing' + title, fontsize = 24)
+	plt.title('SpMM runtime at various sparsities on Intel i5,\nusing ' + title, fontsize = 24)
 	plt.xlabel("Sparsity (%)", fontsize = 24)
 	plt.ylabel("Runtime (sec)", fontsize = 24)
 	plt.yticks( fontsize = 20)
