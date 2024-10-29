@@ -568,7 +568,7 @@ void schedule_KMN_sp_online_B(sp_pack_t* sp_pack, float* B, float* B_p, float* C
 
 
 
-void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int M, int N, int K, int p, 
+void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int M, int N, int K, int pross, 
 	cake_cntx_t* cake_cntx, blk_dims_t* x) {
 
 	// copy over block dims to local vars to avoid readibility ussiues with x->
@@ -582,6 +582,21 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 	int p_l = x->p_l, m_pad = x->m_pad, k_pad = x->k_pad, n_pad = x->n_pad;
 	int Mb = x->Mb, Kb = x->Kb, Nb = x->Nb;
 	int M_padded = x->M_padded;
+
+	// Jonas print stuff
+	int print = 0;
+	if (print == 1)
+	{
+		printf("\nm_c: %d", m_c);
+		printf("\nm_c1: %d", m_c1);
+		printf("\nmr_rem: %d", mr_rem);
+		printf("\np_l: %d", p_l);
+		printf("\nm_pad: %d, n_pad: %d, k_pad: %d, ", m_pad, n_pad, k_pad);
+		printf("\nNb: %d, b: %d, Nb: %d", Mb, Kb, Nb);
+		printf("\nM_padded: %d", M_padded);
+		printf("\n");
+	}
+	printf("\n");
 
 	int m, k, n; //, m_start, m_end, m_inc, k_start, k_end, k_inc;
 	int m1, n1, m_cb, n_c_t, p_used, core, C_offset = 0;
@@ -608,18 +623,29 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 
 			if((m == Mb - 1) && m_pad) {
 				p_used = p_l;
-				m_cb = m_r*mr_rem ; //M % (p*m_c);
-				m1 = (M - (M % (p*m_c)));
+				m_cb = m_r*mr_rem ; //M % (pross*m_c);
+				m1 = (M - (M % (pross*m_c)));
 			} else {
-				p_used = p;
+				p_used = pross;
 				m_cb = p_used*m_c;
-				m1 = m*p*m_c;
+				m1 = m*pross*m_c;
 			}
+
+			// Jonas print cores stuff
+			printf("\nm_c1_last_core: %d", m_c1_last_core);
+			printf("\nfor n = %d of Mb %d", m, Mb);
+			printf("\np_used = %d", p_used);
+			printf("\np = %d", pross);
+			printf("\np_l = %d", p_l);
+			// printf("\n%d", );
+			// printf("\ncore nr used: ");
 
 
 			// pragma omp here (i_c loop)
 			#pragma omp parallel for private(core,k)
 			for(core = 0; core < p_used; core++) {
+				// jonas
+				// printf("%d  ", core);
 
 				// These vars must be private to thread, 
 				// otherwise out of bounds memory access possible
@@ -642,11 +668,11 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 						k_c_t = k_c1;
 					}
 
-					int out_ind = (m*p*m_c*K + k*m_cb*k_c + core*m_c_x*k_c_t) / m_r;
-					int a_ind = m*p*m_c*K + k*m_cb*k_c + core*m_c_x*k_c_t;
+					int out_ind = (m*pross*m_c*K + k*m_cb*k_c + core*m_c_x*k_c_t) / m_r;
+					int a_ind = m*pross*m_c*K + k*m_cb*k_c + core*m_c_x*k_c_t;
 					// int a_ind = ((m*p*m_c*Kb + k*m_cb) / m_r) + core*mr_per_core;
 					int b_ind = n*K*n_c + k*k_c*n_c_t;
-					int c_ind = n*M_padded*n_c + m*p*m_c*n_c_t + core*m_c_x*n_c_t;
+					int c_ind = n*M_padded*n_c + m*pross*m_c*n_c_t + core*m_c_x*n_c_t;
 					
 					for(n_reg = 0; n_reg < (n_c_t / n_r); n_reg++) {
 
@@ -675,7 +701,7 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 			}
 
 
-			C_offset = m*p*m_c*N + n*n_c;
+			C_offset = m*pross*m_c*N + n*n_c;
 
 			#pragma omp parallel for private(core)
 			for(core = 0; core < p_used; core++) {
@@ -697,6 +723,9 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 			}
 		}
 	}
+
+	// JONAS
+	printf("\n");
 }
 
 

@@ -18,6 +18,9 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 	sch = KMN;
 	// sch = set_schedule(sch, M, N, K);
 
+	// JOnas include almost all in time
+	clock_gettime(CLOCK_REALTIME, &start1);
+
 	if(cake_cntx == NULL) {
 		cake_cntx = cake_query_cntx();
 	}
@@ -28,10 +31,18 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 
 	init_sparse_block_dims(M, N, K, p, x, cake_cntx, sch, argv, density, 4, alg, mcu, kcu, ncu);
 	omp_set_num_threads(p);
+	// JONAS OMP
+	printf("\nnumber of threads assigned OpenMP = %d", p);
+	printf("\nnumber of threads from OpenMP = %d", omp_get_num_threads());
+	printf("\nmax # of threads from OpenMP = %d", omp_get_max_threads());
+	printf("\nthread number from OpenMP = %d", omp_get_thread_num());
+	printf("\n");
 
 	if(DEBUG) printf("m_r = %d, n_r = %d\n\n", cake_cntx->mr, cake_cntx->nr);
 	if(DEBUG) printf("mc = %d, kc = %d, nc = %d, alpha_n = %f\n", x->m_c, x->k_c, x->n_c, cake_cntx->alpha_n);
 
+	// // JOnas include packing in time
+	// clock_gettime(CLOCK_REALTIME, &start1);
 
 	if(sp_pack == NULL) {
 
@@ -51,8 +62,8 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 		if(DEBUG) printf("A sparse pack time: %f \n", diff_t ); 
 	}
 
-
-	clock_gettime(CLOCK_REALTIME, &start1);
+	// JONAS original position
+	// clock_gettime(CLOCK_REALTIME, &start1);
 
 
 
@@ -160,6 +171,9 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
     nanoseconds = end1.tv_nsec - start1.tv_nsec;
     diff_t = seconds + nanoseconds*1e-9;
 	if(DEBUG) printf("full gemm time: %f \n", diff_t); 	// exit(1);
+
+	// JONAS indside times
+	printf("\ninside time: %f", diff_t);
 
 	times = diff_t;
 

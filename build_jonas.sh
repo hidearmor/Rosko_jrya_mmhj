@@ -1,22 +1,7 @@
-# Remove CAKE if it's there
-if [ -d "CAKE_on_CPU" ]; 
-then
-    sudo rm -rf CAKE_on_CPU
-else 
-	echo "Hehe"; 
-fi
-
-# clean build as it is now for a fresh start
 make clean
 
-
-# install CAKE
-git clone https://github.com/vnatesh/CAKE_on_CPU.git
 cd CAKE_on_CPU
 source env.sh
-./install.sh
-make -f kernels.mk
-make
 sudo ldconfig $CAKE_HOME
 cd ..
 
