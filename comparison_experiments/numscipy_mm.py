@@ -1,121 +1,111 @@
-import os
 import sys
-import datetime
 import time
 
 import numpy as np
-import scipy as sp
+import scipy as scipy
 
 def print_matrices(sparse_matrix, dense_matrix, result):
     print("Sparse Matrix:\n", sparse_matrix.toarray().round(2))  # Converts sparse to dense to display
     print("\nDense Matrix:\n", dense_matrix.round(2))
     print("\nResult of Sparse x Dense Multiplication:\n", result.round(2))
 
-# does NOT work properly
 def diagonals_with_density(N, d):
-    # 1. Calculate the number of non-zero elements (nnz) based on the density
-    total_elements = N * N
-    nnz = int(d * total_elements)
-    
-    # 2. Estimate the number of diagonals
-    # We want an uneven number of diagonals that is close to the nnz we need
-    num_diagonals = 2 * (nnz // N) + 1  # Closest odd number of diagonals
-    
+    nnz = int(d * (N * N))
+    nnz_exact = 0
+    acc1 = 0
+    acc2 = N
+    counter = 2
+    num_diagonals = 1
+
+    while(acc2 < nnz):
+        acc1 = acc2
+        acc2 += 2*(N-counter)
+        counter += 2
+        num_diagonals += 2
+
+    if acc2-nnz <= nnz-acc1:
+        nnz_exact = acc2
+    else: 
+        num_diagonals += -2
+        nnz_exact = acc1
+
     # Ensure the number of diagonals does not exceed the matrix size
     if num_diagonals > 2 * (N - 1) + 1:
         num_diagonals = 2 * (N - 1) + 1  # Max number of diagonals is 2N-1
-    
-    # 3. Create the diagonal list centered around 0 (evenly distributed)
+
     half_diags = (num_diagonals - 1) // 2
     diags = list(range(-half_diags, half_diags + 1))
-    
-    # 4. Calculate the exact number of non-zero values based on the diagonals
-    nnz_exact = sum(N - abs(diag) for diag in diags)
-    exact_density = nnz_exact / total_elements
-    
+
+    exact_density = nnz_exact / (N * N)
     return diags, exact_density
 
-# def SparseDenseMM(M, K, N, sp):
-def SparseDenseMM(N, d_org, format):
-    # 2. build random sparse matrix A with sparsity sp
-    # 3. build random dense matrix B
-    # 4. (maybe) convert to correct formats
-    # 5. if warmup: start time
-    # 6. perform multiplications
-    # 7. if warmup: end time and return it
-
-    diags, d = diagonals_with_density(N, d_org)
-    print(d, d_org)
-    
+def SparseDenseMM(N, d, type):
     dense_matrix = np.random.rand(N,N)
 
     rng = np.random.default_rng()
     sparse_matrix = None
-    # sparse_matrix = sp.sparse.random(N, N, density=d, random_state=rng, format='csr')
-    if format == 'dia':
-        # diags = [0]
+    if type == 'diagonal':
+        diags, d = diagonals_with_density(N, d)
         data = rng.random((len(diags), N))
-        sparse_matrix = sp.sparse.dia_array((data, diags), shape=(N, N))
-    else:
-        sparse_matrix = sp.sparse.random_array((N, N), density=d, random_state=rng, format = format)
+        sparse_matrix = scipy.sparse.dia_array((data, diags), shape=(N, N))
+    elif type == 'random_csr':
+        sparse_matrix = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr')
+    elif type == 'random_arr':
+        sparse_matrix = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr').toarray()
+    else: return -1.0, -1.0
 
-    start = time.time()
+    start = time.perf_counter()
     result = sparse_matrix @ dense_matrix
-    end = time.time()
+    end = time.perf_counter()
 
-    # print(format + str(sparse_matrix.toarray().round(2)))
-    return  end-start
+    return  end-start, result
 
-# formats = ['csr']
-formats = ['csr', 'bsr', 'coo', 'csc', 'dia']
-file = open('format_horse_race.txt', 'a')
-file.write('format, N, density, time, runs')
-for format in formats:
-    res = 0
-    loops = 10
-    N = 4096
-    N = 100
-    d = 0.3
-    for i in range(0, loops):
-        SparseDenseMM(N, d, format)
-    for i in range(0, loops):
-        res += SparseDenseMM(N, d, format)
-    result = format + ', ' + str(N) + ', ' + str(d) + ', ' + str(round((res/(loops)), 7)) + ', ' + str(loops)
+def DenseMM(M, N, K):
+    matrix_A = np.random.rand(M,K)
+    matrix_B = np.random.rand(K,N)
+
+    start = time.perf_counter()
+    result = matrix_A @ matrix_B
+    end = time.perf_counter()
+
+    return  end-start, result
+
+def main(N, M, K, p, sp_raw, trials, warmups, type, algo, filename):
+    sp = float(sp_raw)/100
+    if type=='diagonal':
+        _, sp = diagonals_with_density(N, (1.0-sp))
+    d = 1.0-sp
+    res_total = 0.0
+
+    if type == 'row_pattern':
+        M_temp = round((1.0 - sp) * M)
+        sp = 1.0 - (M_temp / M)
+        M = M_temp
+
+    for i in range(warmups):
+        (type == 'dense' or type == 'row_pattern') if DenseMM(M, N, K) else SparseDenseMM(N, d, type)
+
+    for i in range(trials):
+        res_part = 0.0
+        if type == 'dense' or type == 'row_pattern':
+            res_part, _ = DenseMM(M, N, K)
+        else:
+            res_part, _ = SparseDenseMM(N, d, type)
+        res_total += res_part
+    
+    avg = round(res_total / trials, 6)
+    file = open(filename, 'a')
+    sp_print = round(sp*100, 2)
+    print(f'{algo},{p},{sp_print},{M},{K},{N},{avg},{trials}')
+    file.write(f'{algo},{p},{sp_print},{M},{K},{N},{avg},{trials}')
     file.write('\n')
-    file.write(result)
-    print(result)
 
-
-
-# structure to link to experiments:
-
-# def main(M, K, N, sp, ntrials, filename):
-#     warmups = 10
-#     for i in range(warmups):
-#         SparseDenseMM(M, K, N, sp)
-    
-#     res = 0.0
-#     for i in range(ntrials):
-#         res += SparseDenseMM(M, K, N, sp)
-    
-#     # run loop warmup many times
-#     # run loop ntrials many times
-#     # calculate avg
-#     # print to results_comp file
-    
-# if __name__ == "__main__":
-#     if len(sys.argv) != 6:
-#         print("Format b like dis: numscipy_mm.py M K N s, ntrials filename")
-#         sys.exit(1)
-    
-#     M = sys.argv[1]
-#     K = sys.argv[2]
-#     N = sys.argv[3]
-#     sp = sys.argv[4]
-#     ntrials = sys.argv[5]
-#     filename = sys.argv[6]
-#     main(M, K, N, sp, ntrials, filename)
-
+if __name__ == "__main__":
+    if len(sys.argv) != 11: # first argument is path for this script
+        print("Format b like dis: numscipy_mm.py N sp trials warmups type filename")
+        sys.exit(1)
+    _, N, M, K, p, sp, trials, warmups, type, algo, filename = sys.argv
+    main(int(N), int(M), int(K), int(p), float(sp), int(trials), int(warmups), type, algo, filename)
 
 # np.random.rand(3,2) https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html
 # scipy https://docs.scipy.org/doc/scipy/reference/sparse.html#

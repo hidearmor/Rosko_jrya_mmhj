@@ -7,14 +7,14 @@ int main( int argc, char** argv ) {
 	int M, K, N, p, nz, mr, nr, ntrials, alg, warmup; // alg is only for rosko use
 	struct timespec start, end;
 	double diff_t;
-	float density, sp;
+	float density, sp_inp;
 	std::string filename, algo;
 
 	M = atoi(argv[1]); 
 	K = atoi(argv[2]);
 	N = atoi(argv[3]);
 	p = atoi(argv[4]);
-	sp = atof(argv[5]);
+	sp_inp = atof(argv[5]);
 	ntrials = atoi(argv[6]);
 	warmup = atoi(argv[7]);
 	algo = std::string(argv[8]);
@@ -31,7 +31,7 @@ int main( int argc, char** argv ) {
 
 	// ---------- Initialize A and B -------------------------
     srand(time(NULL)); 
-	rand_sparse(A, M, K, ((float) sp) / 100.0); // init A with random uniform sparsity
+	float sp = row_pattern_sparse(A, N, N, ((float) sp_inp) / 100.0, -1); // init A with row pattern
 	rand_init(B, K, N); // init B with random nnz
 
 	// --------- Rosko init (begin) -------------------
