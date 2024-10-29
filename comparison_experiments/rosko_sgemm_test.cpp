@@ -48,15 +48,17 @@ int main( int argc, char** argv ) {
     float tttmp[18];
     int flushsz = 2*cake_cntx->L3 / sizeof(float);
     diff_t = 0.0;
+	double myDiff = 0.0;
 
 	// --------- Rosko init (end) -------------------
     
     // printf("alg = %d, flushsize = %d\n", alg, flushsz);
 
     for(int i = 0; i < (ntrials + warmup); i++) {
-	// for(int i = 0; i < (1); i++) {
-
         float* dirty = (float *) malloc(flushsz * sizeof(float));
+		// should this run private ? like this example:
+			// #pragma omp parallel for private(core,k)
+			// for(core = 0; core < p_used; core++) {
         #pragma omp parallel for
         for (int dirt = 0; dirt < flushsz; dirt++){
             dirty[dirt] += dirt%100;
@@ -72,16 +74,26 @@ int main( int argc, char** argv ) {
 			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
 			// printf("sss %f\n", y);
 		} else {
+			clock_gettime(CLOCK_REALTIME, &start);
 			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
+			clock_gettime(CLOCK_REALTIME, &end);
+			double seconds = end.tv_sec - start.tv_sec;
+			double nanoseconds = end.tv_nsec - start.tv_nsec;
+			myDiff += seconds + nanoseconds*1e-9;
 			// printf("sss %f\n", y);
 			diff_t += y;
 		}
 
         free(dirty);
     }
+	clock_gettime(CLOCK_REALTIME, &end);
 
-	printf("%s,%d,%f,%d,%d,%d,%f,%d\n", algo.c_str(), p, sp, M, K, N, diff_t / ntrials, ntrials);
-	fprintf(fp, "%s,%d,%f,%d,%d,%d,%f,%d\n", algo.c_str(), p, sp, M, K, N, diff_t / ntrials, ntrials);
+
+	printf("\n------------------");
+	printf("\nouter time: %f", myDiff / ntrials);
+	printf("\nrosko Diff: %f", diff_t / ntrials);
+	printf("\n%s,%d,%f,%d,%f,%f,%d\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials);
+	fprintf(fp, "%s,%d,%f,%d,%f,%f,%d\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials);
 	fclose(fp);
 
 	// cake_sgemm_checker(A, B, C, N, M, K);
