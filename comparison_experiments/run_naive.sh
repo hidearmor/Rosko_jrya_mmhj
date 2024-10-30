@@ -39,16 +39,19 @@ fi
 
 echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
 
+# Experiment parameters setup
 declare -i trials=10
 declare -i warmups=10
 declare -i n=1024
 declare -i cores=10
-type="random" # options: random, diagonal
-
-# algo might not be a relevenat parameter
+num_algorithms=2 # the number of algorithms used in this experiment
+algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dense
+sparsity_pattern="random-uniform"  # options: random, diagonal, row-pattern, column-pattern
+num_sparsity_values=7 # the number of sparsity values used in this experiment
+sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
 
 # for sp in 70 75 80 85 90 95 98 99;
-for sp in 60 70 80 90 95 98 99;
+for sp in ${sparsity_values[@]};
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups rosko $FILE
 	./naive_mm_test 	$n $n $n $sp $trials $warmups naive $FILE
@@ -69,9 +72,10 @@ path=$(echo "$output" | sed -n '1p')
 time=$(echo "$output" | sed -n '2p')
 underscore="_"
 
-cp $FILE $path$time$underscore$FILE$underscore$type
+cp $FILE $path$time$underscore$FILE$underscore$sparsity_pattern
 
-# python3 plots.py
+# Call the python plot script with inputs
+python3 plots_comp.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash.txt"
