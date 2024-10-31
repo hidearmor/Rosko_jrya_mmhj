@@ -56,7 +56,7 @@ rosko_armv8: $(wildcard *.h) $(wildcard *.c)
 rosko_haswell: $(wildcard *.h) $(wildcard *.c)
 	g++ $(CFLAGS) rosko_sgemm_test.cpp $(LIBS) -o rosko_sgemm_test
 	g++ $(CFLAGS) naive_mm_test.cpp $(LIBS) -o naive_mm_test
-	g++ $(CFLAGS) test_row_pattern.cpp $(LIBS) -o test_row_pattern
+	g++ $(CFLAGS) test_pattern.cpp $(LIBS) -o test_pattern
 	g++ $(CFLAGS) rosko_sgemm_test_row_pattern.cpp $(LIBS) -o rosko_sgemm_test_row_pattern
 
 crisko_haswell: $(wildcard *.h) $(wildcard *.c)
