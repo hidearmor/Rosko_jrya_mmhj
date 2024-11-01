@@ -8,7 +8,7 @@ int main( int argc, char** argv ) {
 	struct timespec start, end;
 	double diff_t;
 	float density, sp;
-	std::string filename, algo;
+	std::string filename, algo, measure_r;
 
 	M = atoi(argv[1]); 
 	K = atoi(argv[2]);
@@ -19,6 +19,11 @@ int main( int argc, char** argv ) {
 	warmup = atoi(argv[7]);
 	algo = std::string(argv[8]);
 	filename = std::string(argv[9]);
+	measure_r = std::string(argv[10]);
+	int measure = 0;
+	if (measure_r == "all") measure = 0;
+	else if (measure_r == "packing") measure = 1;
+	else if (measure_r == "mm") measure = 2;
 
 
 	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
@@ -71,11 +76,11 @@ int main( int argc, char** argv ) {
 
 		
 		if(i < warmup) {
-			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
+			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg, measure);
 			// printf("sss %f\n", y);
 		} else {
 			clock_gettime(CLOCK_REALTIME, &start);
-			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
+			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg, measure);
 			clock_gettime(CLOCK_REALTIME, &end);
 			double seconds = end.tv_sec - start.tv_sec;
 			double nanoseconds = end.tv_nsec - start.tv_nsec;
@@ -92,8 +97,8 @@ int main( int argc, char** argv ) {
 	printf("\n------------------");
 	printf("\nouter time: %f", myDiff / ntrials);
 	printf("\nrosko Diff: %f", diff_t / ntrials);
-	printf("\n%s,%d,%f,%d,%f,%f,%d\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials);
-	fprintf(fp, "%s,%d,%f,%d,%f,%f,%d\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials);
+	printf("\n%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
+	fprintf(fp, "%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
 	fclose(fp);
 
 	// cake_sgemm_checker(A, B, C, N, M, K);

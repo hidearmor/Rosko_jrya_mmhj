@@ -12,7 +12,7 @@ echo $CAKE_HOME;
 
 make;
 
-FILE="results_p_exploration"
+FILE="results_p"
 
 # Check if the results file already exists
 if [ -f "$FILE" ]; then
@@ -22,23 +22,23 @@ else
     echo "File '$FILE' does not exist."
 fi
 
-echo "algo,p,sp,N,rosko-time,outer-time,ntrials" >> $FILE
+echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
 
-declare -i trials=20
+declare -i trials=15
 declare -i warmups=0
 declare -i n=4000
-declare -i cores=14
 type="random" # options: random_csr, random_arr, diagonal
 
 # not sure if this one makes any difference
 # export GOMP_CPU_AFFINITY="0 1 2 3 4 5 6 7 8 9";
 
-# for sp in 70 75 80 85 90 95 98 99;
-for p in 5 8 10 14 20 40 50 100;
+for measure in all packing mm;
 do
-	./rosko_sgemm_test 	$n $n $n $p 75 $trials $warmups rosko $FILE
-	# python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_csr numpy_csr $FILE
-	# python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_arr numpy_arr $FILE
+	for p in 5 10 14 20 40 50 100 300 600 1000 10000;
+	# for p in 100000;
+	do
+		./rosko_sgemm_test 	$n $n $n $p 75 $trials $warmups rosko $FILE $measure
+	done
 done
 
 

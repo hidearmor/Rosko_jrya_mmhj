@@ -6,7 +6,7 @@
 double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p, 
 	cake_cntx_t* cake_cntx, float density, char* argv[], 
 	bool packedA, sp_pack_t* sp_pack, bool packedB, 
-	float alpha, float beta, enum sched sch, int alg, int mcu, int kcu, int ncu) {
+	float alpha, float beta, enum sched sch, int alg, int measure, int mcu, int kcu, int ncu) {
 
 
 	size_t A_sz, B_sz, C_sz;	
@@ -19,9 +19,10 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 	// sch = set_schedule(sch, M, N, K);
 
 	// JOnas include almost all in time
-	clock_gettime(CLOCK_REALTIME, &start1);
+	if (measure == 0) clock_gettime(CLOCK_REALTIME, &start1);
 
 	if(cake_cntx == NULL) {
+		printf("\nauto-calculating");
 		cake_cntx = cake_query_cntx();
 	}
 
@@ -42,7 +43,7 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 	if(DEBUG) printf("mc = %d, kc = %d, nc = %d, alpha_n = %f\n", x->m_c, x->k_c, x->n_c, cake_cntx->alpha_n);
 
 	// // JOnas include packing in time
-	// clock_gettime(CLOCK_REALTIME, &start1);
+	if (measure == 1) clock_gettime(CLOCK_REALTIME, &start1);
 
 	if(sp_pack == NULL) {
 
@@ -63,7 +64,7 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 	}
 
 	// JONAS original position
-	// clock_gettime(CLOCK_REALTIME, &start1);
+	if (measure == 2) clock_gettime(CLOCK_REALTIME, &start1);
 
 
 
