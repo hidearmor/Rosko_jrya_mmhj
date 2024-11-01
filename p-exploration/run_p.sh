@@ -24,9 +24,9 @@ fi
 
 echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
 
-declare -i trials=15
-declare -i warmups=0
-declare -i n=4000
+declare -i trials=10
+declare -i warmups=5
+declare -i n=6000
 type="random" # options: random_csr, random_arr, diagonal
 
 # not sure if this one makes any difference
@@ -35,6 +35,7 @@ type="random" # options: random_csr, random_arr, diagonal
 for measure in all packing mm;
 do
 	for p in 5 10 14 20 40 50 100 300 600 1000 10000;
+	# for p in 5;
 	# for p in 100000;
 	do
 		./rosko_sgemm_test 	$n $n $n $p 75 $trials $warmups rosko $FILE $measure

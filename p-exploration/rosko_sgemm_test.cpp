@@ -95,8 +95,8 @@ int main( int argc, char** argv ) {
 
 
 	printf("\n------------------");
-	printf("\nouter time: %f", myDiff / ntrials);
-	printf("\nrosko Diff: %f", diff_t / ntrials);
+	// printf("\nouter time: %f", myDiff / ntrials);
+	// printf("\nrosko Diff: %f", diff_t / ntrials);
 	printf("\n%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
 	fprintf(fp, "%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
 	fclose(fp);
