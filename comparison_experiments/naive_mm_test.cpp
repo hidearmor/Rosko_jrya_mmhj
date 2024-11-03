@@ -53,7 +53,7 @@ int main( int argc, char** argv ) {
 	struct timespec start, end;
 	double diff_t;
 	float density, sp;
-	std::string filename, algo;
+	std::string filename, algo, sp_pattern;
 
 	M = atoi(argv[1]); 
 	K = atoi(argv[2]);
@@ -62,10 +62,11 @@ int main( int argc, char** argv ) {
 	sp = atof(argv[4]);
 	ntrials = atoi(argv[5]);
 	warmup = atoi(argv[6]);
-	algo = std::string(argv[7]);
-	filename = std::string(argv[8]);
+	sp_pattern = std::string(argv[7]);
+	algo = std::string(argv[8]);
+	filename = std::string(argv[9]);
 
-	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
+	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, sparsity pattern = %s, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, sp_pattern.c_str(), algo.c_str());
 
 
 	// ---------- Memory allocation for matrices --------------
@@ -75,7 +76,21 @@ int main( int argc, char** argv ) {
 
 	// ---------- Initialize A and B -------------------------
     srand(time(NULL)); 
-	rand_sparse(A, M, K, ((float) sp) / 100.0); // init A with random uniform sparsity
+
+	if (sp_pattern == "random-uniform") {
+		rand_sparse(A, M, K, ((float) sp) / 100.0); // init A with random uniform sparsity
+		// no need to update sp
+	} else if (sp_pattern == "row-pattern") {
+		sp = row_pattern_sparse(A, M, K, ((float) sp) / 100.0, -1);
+	} else if (sp_pattern == "column-pattern") {
+		// sp = column_pattern_sparse(A, M, K, ((float) sp) / 100.0, -1);
+	} else if (sp_pattern == "diagonal") {
+		// sp = diagonal_sparse(A, M, K, ((float) sp) / 100.0);
+	} else {
+		printf("%s is not a valid sparsity pattern\n", sp_pattern.c_str());
+		return -1;
+	}
+
 	rand_init(B, K, N); // init B with random nnz
 
 	// --------- Naive init -------------------

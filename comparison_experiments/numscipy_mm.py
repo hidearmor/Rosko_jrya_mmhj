@@ -77,17 +77,19 @@ def main(N, M, K, p, sp_raw, trials, warmups, type, algo, filename):
     d = 1.0-sp
     res_total = 0.0
 
-    if type == 'row_pattern':
+    if type == 'row-pattern':
         M_temp = round((1.0 - sp) * M)
         sp = 1.0 - (M_temp / M)
         M = M_temp
-
+    # MAYA: We should use a combo of algo and type to determine what type of data
+    # should be run on which algorithm, instead of using type alone to indicate that.
+    # Doing that, we won't need the type names: dense, random_csr, random_arr
     for i in range(warmups):
-        (type == 'dense' or type == 'row_pattern') if DenseMM(M, N, K) else SparseDenseMM(N, d, type)
+        (type == 'dense' or type == 'row-pattern') if DenseMM(M, N, K) else SparseDenseMM(N, d, type)
 
     for i in range(trials):
         res_part = 0.0
-        if type == 'dense' or type == 'row_pattern':
+        if type == 'dense' or type == 'row-pattern':
             res_part, _ = DenseMM(M, N, K)
         else:
             res_part, _ = SparseDenseMM(N, d, type)
