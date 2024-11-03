@@ -15,6 +15,7 @@ from matplotlib import ticker as mticker
 ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko', 'numpy_arr':'Array-Numpy', 'numpy_csr':'CSR-Numpy', 'naive':'Naive', 'numpy_dense':'Array-Numpy, zeros stripped'}
 ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 'row-pattern', 'diagonal', 'column-pattern'] # If changed, then update makeTitle()
 
+DEBUG = False
 
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -86,7 +87,7 @@ def makeLabels(algos):
 
 def main():
     
-	# print(sys.argv)
+	if DEBUG: print(sys.argv)
  
     # Read the type of sparsity pattern from input
 	sparsity_pattern = sys.argv[1]
