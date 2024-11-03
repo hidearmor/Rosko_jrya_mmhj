@@ -37,17 +37,17 @@ else
 fi
 
 
-echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,time,n,ntrials" >> $FILE
 
 # Experiment parameters setup
-declare -i trials=2
-declare -i warmups=1
-declare -i n=256
+# declare -i trials=2
+# declare -i warmups=1
+# declare -i n=256
+# declare -i cores=4
+declare -i trials=10
+declare -i warmups=10
+declare -i n=2000
 declare -i cores=4
-# declare -i trials=10
-# declare -i warmups=10
-# declare -i n=10000
-# declare -i cores=10
 num_algorithms=2 # the number of algorithms used in this experiment
 algorithms=("rosko" "numpy_dense")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 sparsity_pattern="row-pattern"  # options: random-uniform, diagonal, row-pattern, column-pattern
@@ -59,7 +59,7 @@ for sp in ${sparsity_values[@]};
 do
 	# ./rosko_sgemm_test_row_pattern $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-	python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dense $FILE
+	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dense $FILE
 done
 
 # exit 0 # exit without errors

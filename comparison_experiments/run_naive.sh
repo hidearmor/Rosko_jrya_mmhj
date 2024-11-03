@@ -37,17 +37,17 @@ else
 fi
 
 
-echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,time,ntrials" >> $FILE
 
 # Experiment parameters setup
-declare -i trials=2
-declare -i warmups=1
-declare -i n=256
+# declare -i trials=2
+# declare -i warmups=1
+# declare -i n=256
+# declare -i cores=4
+declare -i trials=10
+declare -i warmups=10
+declare -i n=1000
 declare -i cores=4
-# declare -i trials=10
-# declare -i warmups=10
-# declare -i n=1024
-# declare -i cores=10
 num_algorithms=2 # the number of algorithms used in this experiment
 algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern

@@ -37,23 +37,23 @@ else
 fi
 
 
-echo "algo,p,sp,M,K,N,time,ntrials" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,time,ntrials" >> $FILE
 
 # Experiment parameters setup
-declare -i trials=2
-declare -i warmups=1
-declare -i n=256
+# declare -i trials=2
+# declare -i warmups=1
+# declare -i n=256
+# declare -i cores=4
+declare -i trials=10
+declare -i warmups=10
+declare -i n=2000
 declare -i cores=4
-# declare -i trials=10
-# declare -i warmups=10
-# declare -i n=5000
-# declare -i cores=10
-num_algorithms=3 # the number of algorithms used in this experiment
-algorithms=("rosko" "numpy_csr" "numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
-sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-num_sparsity_values=7 # the number of sparsity values used in this experiment
-sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
-# sparsity_values=(99 99.5 99.8 99.9)
+num_algorithms=2 # the number of algorithms used in this experiment
+algorithms=("rosko" "numpy_dia")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+sparsity_pattern="diagonal"  # options: random-uniform, diagonal, row-pattern, column-pattern
+num_sparsity_values=4 # the number of sparsity values used in this experiment
+# sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
+sparsity_values=(99 99.5 99.8 99.9)
 
 
 # for sp in 70 75 80 85 90 95 98 99;
@@ -61,11 +61,12 @@ sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
 for sp in ${sparsity_values[@]};
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
-	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
+	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dia $FILE
 
-	# python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_csr numpy_csr $FILE
-	# python3 numscipy_mm.py $n $n $n $cores $sp $trials $warmups random_arr numpy_arr $FILE
+	# ./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
+	# python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
+	# python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
+
 done
 
 # exit 0 # exit without errors

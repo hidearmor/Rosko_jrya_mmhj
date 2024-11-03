@@ -12,8 +12,16 @@ from matplotlib import ticker as mticker
 
 # GLOBAL VARIABLES
 # FYI: currently markers and colors only allow for 5 algorithms in one plot, each with a distinctive marker and color
-ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko', 'numpy_arr':'Array-Numpy', 'numpy_csr':'CSR-Numpy', 'naive':'Naive', 'numpy_dense':'Array-Numpy, zeros stripped'}
-ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 'row-pattern', 'diagonal', 'column-pattern'] # If changed, then update makeTitle()
+ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko', 
+                             'numpy_arr':'Array-Numpy', 
+                             'numpy_csr':'CSR-Numpy', 
+                             'naive':'Naive', 
+                             'numpy_dense':'Array-Numpy, zeros stripped', 
+                             'numpy_dia':'Diagonal-Numpy'}
+ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 
+                             'row-pattern', 
+                             'diagonal', 
+                             'column-pattern'] # If changed, then update makeTitle()
 
 DEBUG = False
 
@@ -38,14 +46,18 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	plt.figure(figsize = (6,4))
 	for i in range(len(algos)):
 		algo_time = dft[dft['algo'] == algos[i]]['time'].values
-		plt.plot(sparsities, algo_time, label = labels[i], marker = markers[i], color = colors[i])
+		algo_sparsities = dft[dft['algo'] == algos[i]]['sp'].values
+		plt.plot(algo_sparsities, algo_time, label = labels[i], marker = markers[i], color = colors[i])
 		
 	
 	# plt.ticklabel_format(useOffset=False, style='plain')
 	plt.title('SpMM runtime at various sparsities on Intel i5,\nusing ' + title, fontsize = 24)
 	plt.xlabel("Sparsity (%)", fontsize = 24)
 	plt.ylabel("Runtime (sec)", fontsize = 24)
-	plt.yticks( fontsize = 20)
+	# plt.yticks( fontsize = 10)
+	# num_ticks = len(sparsities) # Number of x-ticks you want
+	# plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
+	plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
 	plt.legend(loc = "upper right", prop={'size': 14})
 	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
 	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
@@ -123,6 +135,9 @@ def main():
 	# Define the labels array based on the algorithms used in experiment
 	labels = makeLabels(algos)
  
+	if DEBUG:
+		print(sparsity_pattern, algos, sparsities, labels)
+  
 	# Create the plot
 	plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname)
     
