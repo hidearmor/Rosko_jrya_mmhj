@@ -24,6 +24,7 @@ fi
 
 echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
 
+person=$1
 declare -i trials=10
 declare -i warmups=5
 declare -i n=6000
@@ -34,7 +35,7 @@ type="random" # options: random_csr, random_arr, diagonal
 
 for measure in all packing mm;
 do
-	for p in 5 10 14 20 40 50 100 300 600 1000 10000;
+	for p in 5 10 14 20 40 50 75 100 125 150 175 200 225 250 275 300 350 600 1000 10000;
 	# for p in 5;
 	# for p in 100000;
 	do
@@ -55,14 +56,14 @@ output=$(python3 "$PYTHON_SCRIPT_PATH" "$FUNCTION_NAME" "$cwd")
 # Read the output values
 path=$(echo "$output" | sed -n '1p')
 time=$(echo "$output" | sed -n '2p')
-underscore="_"
+undscr="_"
 
-cp $FILE $path$time$underscore$FILE$underscore$type
+cp $FILE $path$time$undscr$FILE$undscr$type$undscr$person
 
 # python3 plots.py
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash.txt"
-echo "$commit_hash" > $path$time$underscore$logName$underscore$FILE
+echo "$commit_hash" > $path$time$undscr$logName$undscr$FILE$undscr$person
 
 #####################

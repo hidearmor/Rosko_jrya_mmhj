@@ -1,6 +1,6 @@
 import subprocess
 
-def get_num_cores_old():
+def get_num_cores_cake():
 	ret1 = subprocess.check_output("grep -c ^processor /proc/cpuinfo", shell=True)
 	ret2 = subprocess.check_output("lscpu | grep Thread -m 1 | tr -dc '0-9'", shell=True)
 	ret3 = subprocess.check_output("lscpu | grep Socket -m 1 | tr -dc '0-9'", shell=True)
