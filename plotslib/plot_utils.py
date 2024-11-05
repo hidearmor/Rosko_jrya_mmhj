@@ -28,10 +28,10 @@ def formatTime(time):
 def directoriesFromTime(time, cwd):
     resDir = cwd + '/results/'
     resDateDir = resDir + str(time.date())
-    # if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
-    #     os.mkdir(resDir)
-    # if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
-    #         os.mkdir(resDateDir)
+    if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
+        os.mkdir(resDir)
+    if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
+            os.mkdir(resDateDir)
 
     dateStr = str(time.date()) + '_' + formatTime(time.hour) + '' + formatTime(time.minute)
 
