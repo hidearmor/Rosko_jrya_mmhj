@@ -47,24 +47,24 @@ echo "algo,p,sp,M,K,N,sppattern,time,ntrials, bits" >> $FILE
 # declare -i cores=4
 hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
 person=$1 # argument for who is doing dis
-declare -i trials=5
-declare -i warmups=1
-declare -i n=4000
-declare -i cores=1
-algorithms=("rosko" "numpy_dia")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+declare -i trials=30
+declare -i warmups=10
+declare -i n=4192
+declare -i cores=6
+algorithms=("rosko" "numpy_csr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
-sparsity_pattern="diagonal"  # options: random-uniform, diagonal, row-pattern, column-pattern
-# sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
+sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
+sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
 # sparsity_values=(99 99.5 99.8 99.9)
-sparsity_values=(60 70 80)
+# sparsity_values=(60 70 80)
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 
 for sp in ${sparsity_values[@]};
 do
 	# ./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-	python3 numscipy_mm_test_32.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dia $FILE 32
-	python3 numscipy_mm_test_64.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dia $FILE 64
+	python3 numscipy_mm_test_32.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE 32
+	python3 numscipy_mm_test_64.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE 64
 
 	# ./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	# python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
@@ -91,7 +91,7 @@ nameHype=$unscr$hyperthreading$unscr$person
 cp $FILE $path$time$unscr$FILE$unscr$sparsity_pattern$nameHype
 
 # Call the python plot script with inputs
-python3 plots_comp.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype
+python3 plots_bits.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"

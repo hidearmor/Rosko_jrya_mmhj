@@ -1,0 +1,9 @@
+algo,p,sp,M,K,N,sppattern,time,ntrials, bits
+numpy_csr,6,99.0,600,600,600,random-uniform,0.00052,20, 32
+numpy_csr,6,99.0,600,600,600,random-uniform,0.00101,20, 64
+numpy_csr,6,99.5,600,600,600,random-uniform,0.000335,20, 32
+numpy_csr,6,99.5,600,600,600,random-uniform,0.000706,20, 64
+numpy_csr,6,99.8,600,600,600,random-uniform,0.000218,20, 32
+numpy_csr,6,99.8,600,600,600,random-uniform,0.000447,20, 64
+numpy_csr,6,99.9,600,600,600,random-uniform,0.000171,20, 32
+numpy_csr,6,99.9,600,600,600,random-uniform,0.000385,20, 64
