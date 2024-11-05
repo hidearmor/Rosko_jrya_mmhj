@@ -56,14 +56,15 @@ output=$(python3 "$PYTHON_SCRIPT_PATH" "$FUNCTION_NAME" "$cwd")
 # Read the output values
 path=$(echo "$output" | sed -n '1p')
 time=$(echo "$output" | sed -n '2p')
-undscr="_"
+unscr="_"
+nameHype=$unscr$hyperthreading$unscr$person
 
-cp $FILE $path$time$undscr$FILE$undscr$type$undscr$person
+cp $FILE $path$time$unscr$FILE$unscr$type$nameHype
 
 # python3 plots.py
 
 commit_hash=$(git rev-parse HEAD)
-logName="commit_hash.txt"
-echo "$commit_hash" > $path$time$undscr$logName$undscr$FILE$undscr$person
+logName="commit_hash"
+echo "$commit_hash" > $path$time$unscr$logName$unscr$FILE$nameHype
 
 #####################
