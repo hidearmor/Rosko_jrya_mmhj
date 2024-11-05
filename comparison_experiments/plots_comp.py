@@ -30,7 +30,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 	
 
-def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname, fname = "plot_comp"):
+def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname, env_details, fname = "plot_comp"):
 	plt.rcParams.update({'font.size': 12})
 	markers = ['o','v','s','d','^']
 	colors = ['b','g','k','r','r']
@@ -61,7 +61,7 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	plt.legend(loc = "upper right", prop={'size': 14})
 	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
 	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
-	plt.savefig("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, sparsity_pattern), bbox_inches='tight')
+	plt.savefig("%s%s_%s_%s_perf%s.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')
@@ -128,6 +128,8 @@ def main():
 
 	# Read the name of the results file
 	results_fname = sys.argv[4+num_algos+num_sparsities]
+
+	env_details = sys.argv[5+num_algos+num_sparsities]
 	
 	# Define part of the plot-title depending on the sparsity pattern
 	title = makeTitle(sparsity_pattern)
@@ -139,7 +141,7 @@ def main():
 		print(sparsity_pattern, algos, sparsities, labels)
   
 	# Create the plot
-	plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname)
+	plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname, env_details)
     
     
 
