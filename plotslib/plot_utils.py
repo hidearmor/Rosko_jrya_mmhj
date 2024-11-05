@@ -22,19 +22,23 @@ def getPlotsDirectory(cwd):
 
     return dir, dateStr
 
+def formatTime(time):
+    return '0' + str(time) if time < 10 else str(time)
+
 def directoriesFromTime(time, cwd):
     resDir = cwd + '/results/'
     resDateDir = resDir + str(time.date())
-    if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
-        os.mkdir(resDir)
-    if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
-            os.mkdir(resDateDir)
-    
-    dateStr = str(time.date()) + '_' + str(time.hour) + '' + str(time.minute)
+    # if not (os.path.exists(resDir) & os.path.isdir(resDir)) :
+    #     os.mkdir(resDir)
+    # if not (os.path.exists(resDateDir + '/') & os.path.isdir(resDateDir + '/')):
+    #         os.mkdir(resDateDir)
+
+    dateStr = str(time.date()) + '_' + formatTime(time.hour) + '' + formatTime(time.minute)
 
     return resDateDir + '/', dateStr
 
-# fro running with shell scripts
+# for running with shell scripts
+
 def main(function_name, param):
     if function_name == "getPlotsDirectory":
         path, time = getPlotsDirectory(param)
