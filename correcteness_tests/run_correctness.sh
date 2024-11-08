@@ -14,8 +14,27 @@ echo $CAKE_HOME;
 make clean;
 make;
 
+# variables
+hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+person=$1 # argument for who is doing dis
+declare -i trials=10
+declare -i warmups=10
+declare -i n=100
+declare -i cores=10
+algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
+sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
+sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
+num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
+
+./correctness_test $n $n $n 80 $sparsity_pattern $cores
+
+exit 0; ## all below is old
+
+
+
 # check if results exists and if it does, move it
-FILE="results_comp_naive"
+FILE="results_corr"
 
 # Check if the results file already exists
 if [ -f "$FILE" ]; then
@@ -25,26 +44,9 @@ else
     echo "File '$FILE' does not exist."
 fi
 
-
 echo "algo,p,sp,M,K,N,sppattern,time,ntrials" >> $FILE
 
-# Experiment parameters setup
-# declare -i trials=2
-# declare -i warmups=1
-# declare -i n=256
-# declare -i cores=4
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
-person=$1 # argument for who is doing dis
-declare -i trials=10
-declare -i warmups=10
-declare -i n=1000
-declare -i cores=4
-algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
-num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
-sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
-num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
-
+## RUN
 # for sp in 70 75 80 85 90 95 98 99;
 for sp in ${sparsity_values[@]};
 do
