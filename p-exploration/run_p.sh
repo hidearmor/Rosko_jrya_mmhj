@@ -28,7 +28,7 @@ hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
 person=$1 # argument for who is doing dis
 declare -i trials=10
 declare -i warmups=5
-declare -i n=1000
+declare -i n=4000
 type="random" # options: random_csr, random_arr, diagonal
 
 # not sure if this one makes any difference
