@@ -63,6 +63,8 @@ int main(int argc, char** argv) {
     sp_pattern = std::string(argv[5]);
     p = atof(argv[6]);
 
+    printf("\nn = %d, p = %d, sp = %f, sp_pattern: %s\n", N, p, sp, sp_pattern.c_str());
+
     // Variables to hold matrices A and B
     float* A = nullptr;
     float* B = nullptr;
@@ -72,6 +74,7 @@ int main(int argc, char** argv) {
 
     float* C_rosko = (float*) calloc(M * N , sizeof( float ));
     float* C_naive = (float*) calloc(M * N , sizeof( float ));
+    float* C_naive_copy = (float*) calloc(M * N , sizeof( float ));
     float* C_numpy = (float*) calloc(M * N , sizeof( float ));
 
     // Calculate the density
@@ -80,13 +83,36 @@ int main(int argc, char** argv) {
 
     naive(A, B, C_naive, M, N, K);
     rosko(A, B, C_rosko, M, N, K, density, p, alg);
+    printf("\nstright up rosko naive, same input\n");
+    mat_equals_thesis(C_rosko, C_naive, M, N);
+
+    naive(A, B, C_naive_copy, M, N, K);
+    printf("\nsame input, naive naive\n");
+    mat_equals_thesis(C_naive_copy, C_naive, M, N);
+
+
+    // test if it can be wrong (it can)
+    float* A_2 = nullptr;
+    float* B_2 = nullptr;
+    initialize_matrices(A_2, B_2, M, K, N, sp, sp_pattern, actual_sp);
+    float* C_naive2 = (float*) calloc(M * N , sizeof( float ));
+    naive(A_2, B_2, C_naive2, M, N, K);
+    printf("\ndifferent input, naive1 naive2\n");
+    mat_equals_thesis(C_naive, C_naive2, M, N);
+    printf("\ndifferent input, rosko & naive 2\n");
+    mat_equals_thesis(C_rosko, C_naive2, M, N);
+    free(A_2);
+    free(B_2);
+    free(C_naive2);
     // numpy(A, B, C_numpy); // maybe other parameters
 
-    mat_equals(C_rosko, C_naive, M, N);
-    // mat_equals(C_numpy, C_naive, M, N);
     // Clean up allocated memory
     free(A);
     free(B);
+    free(C_rosko);
+    free(C_naive);
+    free(C_naive_copy);
+    free(C_numpy);
 
     return 0;
 }
