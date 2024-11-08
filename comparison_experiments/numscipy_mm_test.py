@@ -55,7 +55,7 @@ def numpyMM(matrix_A, matrix_B):
 
 def generateMatricesAB(M, N, K, sp, algo, sp_pattern):
     
-    matrix_B = np.random.rand(K,N) # dense matrix 
+    matrix_B = np.random.rand(K,N).astype(np.float32) # dense matrix 
     matrix_A = None # sparse matrix
     
     d = 1.0-sp
@@ -68,13 +68,13 @@ def generateMatricesAB(M, N, K, sp, algo, sp_pattern):
         diags, d = diagonals_with_density(M, d) 
         sp = 1.0-d
         data = rng.random((len(diags), M))
-        matrix_A = scipy.sparse.dia_array((data, diags), shape=(M, K))
+        matrix_A = scipy.sparse.dia_array((data, diags), shape=(M, K), dtype=np.float32)
         
     elif sp_pattern == 'row-pattern':
         M_nz_rows = round(d * M)
         sp = 1.0 - (M_nz_rows / M)
         if algo == 'numpy_dense':
-            matrix_A = np.random.rand(M_nz_rows, K)
+            matrix_A = np.random.rand(M_nz_rows, K).astype(np.float32)
         else:
             # make a sparse row pattern MxK matrix
             pass
@@ -87,7 +87,7 @@ def generateMatricesAB(M, N, K, sp, algo, sp_pattern):
     #     matrix_A = np.random.rand(M, K_nz_cols)
         
     elif sp_pattern == 'random-uniform':
-        matrix_A = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr')
+        matrix_A = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr', dtype=np.float32)
         if algo == 'numpy_arr':
             matrix_A = matrix_A.toarray()
     else:
