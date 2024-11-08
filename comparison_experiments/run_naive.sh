@@ -20,7 +20,7 @@ echo $CAKE_HOME;
 # cd $x
 
 
-
+make clean;
 make;
 
 # filename="results" #Mayas imp
