@@ -44,7 +44,8 @@ echo "algo,p,sp,M,K,N,sppattern,time,n,ntrials" >> $FILE
 # declare -i warmups=1
 # declare -i n=256
 # declare -i cores=4
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading="noHype"
 person=$1 # argument for who is doing dis
 declare -i trials=10
 declare -i warmups=10
