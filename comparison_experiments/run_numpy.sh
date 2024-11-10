@@ -44,7 +44,8 @@ declare -i trials=2
 declare -i warmups=1
 declare -i n=256
 declare -i cores=4
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading="noHype"
 person=$1 # argument for who is doing dis
 # declare -i trials=10
 # declare -i warmups=10
@@ -55,7 +56,7 @@ num_algorithms=${#algorithms[@]} # the number of algorithms used in this experim
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
 # sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
 # sparsity_values=(99 99.5 99.8 99.9)
-sparsity_values=(60 70 80 90 95 98 99 99.5 99.8 99.9)
+sparsity_values=(60 70 80 90 95 98 99 99.9)
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 
