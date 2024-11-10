@@ -44,13 +44,15 @@ echo "algo,p,sp,M,K,N,sppattern,time,ntrials" >> $FILE
 # declare -i warmups=1
 # declare -i n=256
 # declare -i cores=4
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading="noHype"
 person=$1 # argument for who is doing dis
 declare -i trials=10
 declare -i warmups=10
 declare -i n=1000
 declare -i cores=4
-algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+# algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+algorithms=("rosko" "naive" "numpy_csr" "numpy_arr") 
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
 sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
@@ -61,6 +63,9 @@ for sp in ${sparsity_values[@]};
 do
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	./naive_mm_test 	$n $n $n $sp $trials $warmups $sparsity_pattern naive $FILE
+	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
+	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
+
 done
 
 # exit 0 # exit without errors
