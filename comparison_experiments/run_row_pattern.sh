@@ -58,9 +58,10 @@ num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used 
 
 for sp in ${sparsity_values[@]};
 do
-	# ./rosko_sgemm_test_row_pattern $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
+	
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dense $FILE
+	
 done
 
 # exit 0 # exit without errors
