@@ -40,17 +40,17 @@ fi
 echo "algo,p,sp,M,K,N,sppattern,time,ntrials" >> $FILE
 
 # Experiment parameters setup
-declare -i trials=2
-declare -i warmups=1
-declare -i n=256
-declare -i cores=4
+# declare -i trials=2
+# declare -i warmups=1
+# declare -i n=256
+# declare -i cores=4
 # hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
 hyperthreading="noHype"
 person=$1 # argument for who is doing dis
-# declare -i trials=10
-# declare -i warmups=10
-# declare -i n=2000
-# declare -i cores=4
+declare -i trials=10
+declare -i warmups=10
+declare -i n=2000
+declare -i cores=4
 algorithms=("rosko" "numpy_csr" "numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
