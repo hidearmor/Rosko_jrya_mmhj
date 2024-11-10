@@ -61,7 +61,7 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	# num_ticks = len(sparsities) # Number of x-ticks you want
 	# plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
 	# plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
-	plt.legend(loc = "upper right", prop={'size': 14})
+	plt.legend(loc = "upper left", prop={'size': 14})
 	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
 	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
 	plt.savefig("%s%s_%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
