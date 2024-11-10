@@ -10,6 +10,7 @@ cd $x;
 echo $ROSKO_HOME;
 echo $CAKE_HOME;
 
+make clean;
 make;
 
 FILE="results_p"
@@ -24,7 +25,8 @@ fi
 
 echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
 
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading="noHype"
 person=$1 # argument for who is doing dis
 declare -i trials=10
 declare -i warmups=5
