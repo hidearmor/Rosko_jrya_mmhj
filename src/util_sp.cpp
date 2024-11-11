@@ -211,6 +211,22 @@ int run_tests_sparse_test() {
 	return 0;
 }
 
+// randomized sparse Normal(0,1) matrix with sparsity % of values determined by sigma (std dev)
+void rand_sparse_gaussian(float* mat, int r, int c, float mu, float sigma) {
+	int nnz = 0;
+	for(int i = 0; i < r*c; i++) {
+		float x = normalRandom()*sigma+mu;
+		if(fabs(x) <= 2) { // 2 sigmas i.e. 95% sparse
+			mat[i] = 0;
+		} else {
+			mat[i] =  x;
+			nnz++;
+		}
+	}	
+	printf("nnz = %d\n", nnz);
+}
+
+// Thesis related
 
 // randomized sparse matrix in range [-1,1] 
 // with sparsity % of values that are zero
@@ -338,8 +354,6 @@ float row_pattern_sparse(float* mat, int r, int c, float sparsity, int num_nz_ro
     return actual_sparsity;
 }
 
-
-
 // Sparse matrix with column pattern generator
 // Either sparsity should be given as argument or num_nz_rows (call with -1 to disregard a parameter). 
 // returns the actual sparsity of matrix A from 0.0-1.0
@@ -457,20 +471,67 @@ float diagonal_pattern_sparse(float* mat, int r, int c, float sparsity) {
     return actual_sparsity;
 }
 
+// create matrices given pointers for A-sparse and B-dense
+void initialize_matrices(float*& A, float*& B, int M, int K, int N, float sp, const std::string& sp_pattern, float& actual_sp) {
+    // Allocate memory for matrices A and B
+    A = (float*) malloc(M * K * sizeof(float));
+    B = (float*) malloc(K * N * sizeof(float));
 
+    // Check if allocation was successful
+    if (A == nullptr || B == nullptr) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
+    }
 
-// randomized sparse Normal(0,1) matrix with sparsity % of values determined by sigma (std dev)
-void rand_sparse_gaussian(float* mat, int r, int c, float mu, float sigma) {
-	int nnz = 0;
-	for(int i = 0; i < r*c; i++) {
-		float x = normalRandom()*sigma+mu;
-		if(fabs(x) <= 2) { // 2 sigmas i.e. 95% sparse
-			mat[i] = 0;
-		} else {
-			mat[i] =  x;
-			nnz++;
-		}
-	}	
-	printf("nnz = %d\n", nnz);
+    // Initialize matrix A based on sparsity pattern
+    if (sp_pattern == "random-uniform") {
+        actual_sp = rand_sparse(A, M, K, sp / 100.0);
+    } else if (sp_pattern == "row-pattern") {
+        actual_sp = row_pattern_sparse(A, M, K, sp / 100.0, -1);
+    } else if (sp_pattern == "column-pattern") {
+        actual_sp = column_pattern_sparse(A, M, K, sp / 100.0, -1);
+    } else if (sp_pattern == "diagonal") {
+        actual_sp = diagonal_pattern_sparse(A, M, K, sp / 100.0);
+    } else {
+        printf("%s is not a valid sparsity pattern\n", sp_pattern.c_str());
+        free(A);
+        free(B);
+        exit(-1);
+    }
+
+    // Initialize matrix B with random values
+    rand_init(B, K, N);
 }
 
+bool mat_equals_thesis(float* C, float* C_check, int M, int N) {
+
+    int CORRECT = 1;
+    int cnt = 0;
+    int ind1 = 0;
+    float eps = 1e-5; // machine precision level
+
+	for(int m = 0; m < M; m++) {
+	    for(int n = 0; n < N; n++) {
+	        // if(C_check[m1*N + n1] != C[ind1]) {
+	        if(fabs(C_check[ind1] - C[ind1]) > eps) {
+	            cnt++;
+	            CORRECT = 0;
+	        }
+
+	        // if(CHECK_PRINT)
+			// printf("%f\t%f\n", C_check[ind1], C[ind1]);
+	        ind1++; 
+      	}
+    }
+
+    //printf("\n\n");
+
+	if(CORRECT) {
+		printf("CORRECT!\n");
+		return 0;
+	} else {
+		printf("WRONG!\n");
+		printf("%d\n", cnt);
+		return 1;
+	}
+}
