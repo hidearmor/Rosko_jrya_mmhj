@@ -76,11 +76,11 @@ int main( int argc, char** argv ) {
 
 		
 		if(i < warmup) {
-			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg, measure);
+			float y = rosko_sgemm_p_exploration(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg, measure);
 			// printf("sss %f\n", y);
 		} else {
 			clock_gettime(CLOCK_REALTIME, &start);
-			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg, measure);
+			float y = rosko_sgemm_p_exploration(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg, measure);
 			clock_gettime(CLOCK_REALTIME, &end);
 			double seconds = end.tv_sec - start.tv_sec;
 			double nanoseconds = end.tv_nsec - start.tv_nsec;
