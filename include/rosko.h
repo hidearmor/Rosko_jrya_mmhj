@@ -10,11 +10,7 @@
 double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p, 
 	cake_cntx_t* cake_cntx, float density = 0, char* argv[] = NULL, bool packedA = 0, 
 	sp_pack_t* sp_pack = NULL, bool packedB = 0, 
-	float alpha = 1, float beta = 0, enum sched sch = NA, int alg = 2, int measure = 2, int mcu = 0, int kcu = 0, int ncu = 0);
-double rosko_sgemm_p_exploration(float* A, float* B, float* C, int M, int N, int K, int p, 
-	cake_cntx_t* cake_cntx, float density = 0, char* argv[] = NULL, bool packedA = 0, 
-	sp_pack_t* sp_pack = NULL, bool packedB = 0, 
-	float alpha = 1, float beta = 0, enum sched sch = NA, int alg = 2, int measure = 2, int mcu = 0, int kcu = 0, int ncu = 0);
+	float alpha = 1, float beta = 0, enum sched sch = NA, int alg = 2, int mcu = 0, int kcu = 0, int ncu = 0);
 void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int M, int N, int K, int p, 
 	cake_cntx_t* cake_cntx, blk_dims_t* x);
 void schedule_MKN_sp(sp_pack_t* sp_pack, float* B_p, float* C_p, int M, int N, int K, int p, 
@@ -23,6 +19,11 @@ void schedule_NKM_sp(sp_pack_t* sp_pack, float* B_p, float* C_p, int M, int N, i
 	cake_cntx_t* cake_cntx, blk_dims_t* x);
 void schedule_sp(sp_pack_t* A_p, float* B_p, float* C_p, int M, int N, int K, int p, 
 	cake_cntx_t* cake_cntx, blk_dims_t* x, enum sched sch);
+
+double rosko_sgemm_p_exploration(float* A, float* B, float* C, int M, int N, int K, int p, 
+	cake_cntx_t* cake_cntx, float density = 0, char* argv[] = NULL, bool packedA = 0, 
+	sp_pack_t* sp_pack = NULL, bool packedB = 0, 
+	float alpha = 1, float beta = 0, enum sched sch = NA, int alg = 2, int measure = 2, int mcu = 0, int kcu = 0, int ncu = 0);
 
 
 
