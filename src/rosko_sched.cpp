@@ -596,7 +596,7 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 		printf("\nM_padded: %d", M_padded);
 		printf("\n");
 	}
-	printf("\n");
+	// printf("\n");
 
 	int m, k, n; //, m_start, m_end, m_inc, k_start, k_end, k_inc;
 	int m1, n1, m_cb, n_c_t, p_used, core, C_offset = 0;
@@ -632,11 +632,11 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 			}
 
 			// Jonas print cores stuff
-			printf("\nm_c1_last_core: %d", m_c1_last_core);
-			printf("\nfor n = %d of Mb %d", m, Mb);
-			printf("\np_used = %d", p_used);
-			printf("\np = %d", pross);
-			printf("\np_l = %d", p_l);
+			// printf("\nm_c1_last_core: %d", m_c1_last_core);
+			// printf("\nfor n = %d of Mb %d", m, Mb);
+			// printf("\np_used = %d", p_used);
+			// printf("\np = %d", pross);
+			// printf("\np_l = %d", p_l);
 			// printf("\n%d", );
 			// printf("\ncore nr used: ");
 
@@ -725,7 +725,7 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 	}
 
 	// JONAS
-	printf("\n");
+	// printf("\n");
 }
 
 

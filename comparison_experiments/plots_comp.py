@@ -11,7 +11,7 @@ from pathlib import Path
 from matplotlib import ticker as mticker
 
 # GLOBAL VARIABLES
-# FYI: currently markers and colors only allow for 5 algorithms in one plot, each with a distinctive marker and color
+# FYI: currently markers and colors only allow for 10 algorithms in one plot, each with a distinctive marker and color
 ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko', 
                              'numpy_arr':'Array-Numpy', 
                              'numpy_csr':'CSR-Numpy', 
@@ -34,6 +34,8 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	plt.rcParams.update({'font.size': 12})
 	markers = ['o','v','s','d','^']
 	colors = ['b','g','k','r','r']
+	# markers = ['o', 'v', 's', 'd', '^', 'p', '*', 'h', 'x', '+']
+	# colors = ['b', 'g', 'k', 'r', 'c', 'm', 'y', 'orange', 'purple', 'brown']
 	dft = pandas.read_csv(results_fname)
 	# runs = dft['runs'].iloc[0]
 
@@ -51,17 +53,18 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 		
 	
 	# plt.ticklabel_format(useOffset=False, style='plain')
-	plt.title('SpMM runtime at various sparsities on Intel i5,\nusing ' + title, fontsize = 24)
-	plt.xlabel("Sparsity (%)", fontsize = 24)
-	plt.ylabel("Runtime (sec)", fontsize = 24)
-	# plt.yticks( fontsize = 10)
+	plt.title('SpMM runtime at various sparsities,\nusing ' + title, fontsize = 18 )
+	plt.xlabel("Sparsity (%)", fontsize = 16)
+	plt.ylabel("Runtime (sec)", fontsize = 16)
+	plt.yticks( fontsize = 10)
+	plt.xticks( fontsize = 10)
 	# num_ticks = len(sparsities) # Number of x-ticks you want
 	# plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
-	plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
+	# plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
 	plt.legend(loc = "upper right", prop={'size': 14})
 	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
 	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
-	plt.savefig("%s%s_%s_%s_perf%s.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
+	plt.savefig("%s%s_%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')

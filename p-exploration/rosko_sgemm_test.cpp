@@ -26,8 +26,7 @@ int main( int argc, char** argv ) {
 	else if (measure_r == "mm") measure = 2;
 
 
-	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, algo.c_str());
-
+	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, sparsity pattern = %s, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, sp_pattern.c_str(), algo.c_str());
 
 	// ---------- Memory allocation for matrices --------------
 	float* A = (float*) malloc(M * K * sizeof( float )); // initalizes with garbage value
