@@ -20,7 +20,7 @@ echo $CAKE_HOME;
 # cd $x
 
 
-
+make clean;
 make;
 
 # filename="results" #Mayas imp
@@ -44,7 +44,8 @@ echo "algo,p,sp,M,K,N,sppattern,time,n,ntrials" >> $FILE
 # declare -i warmups=1
 # declare -i n=256
 # declare -i cores=4
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading="noHype"
 person=$1 # argument for who is doing dis
 declare -i trials=10
 declare -i warmups=10
@@ -58,9 +59,10 @@ num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used 
 
 for sp in ${sparsity_values[@]};
 do
-	# ./rosko_sgemm_test_row_pattern $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
+	
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dense $FILE
+	
 done
 
 # exit 0 # exit without errors

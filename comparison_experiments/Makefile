@@ -19,6 +19,7 @@ CFLAGS_blis		  += -I$(BLIS_INC_PATH)
 
 # rosko shared library
 LIBS      := -L$(ROSKO_HOME) -lrosko -L$(CAKE_HOME) -lcake
+# LIBS := -Wl,-rpath,$(ROSKO_HOME) -L$(ROSKO_HOME) -lrosko -Wl,-rpath,$(CAKE_HOME) -L$(CAKE_HOME) -lcake
 ROSKO_SRC := $(ROSKO_HOME)/src
 
 

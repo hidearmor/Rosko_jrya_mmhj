@@ -23,10 +23,10 @@ echo $CAKE_HOME;
 make clean;
 make;
 
-# filename="results" #Mayas imp
+# # filename="results" #Mayas imp
 
-# check if results exists and if it does, move it
-FILE="results_comp_naive"
+# # check if results exists and if it does, move it
+FILE="results_comp_varyN"
 
 # Check if the results file already exists
 if [ -f "$FILE" ]; then
@@ -49,28 +49,32 @@ hyperthreading="noHype"
 person=$1 # argument for who is doing dis
 declare -i trials=10
 declare -i warmups=10
-declare -i n=1000
 declare -i cores=4
-# algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
-algorithms=("rosko" "naive" "numpy_csr" "numpy_arr") 
+algorithms=("rosko" "numpy_csr" "numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
+n_start=512
+# n_end=2048
+n_end=4096
+# n_end=10240
+n_step=512
+sparsity_values=(70 85 99)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
-# for sp in 70 75 80 85 90 95 98 99;
-for sp in ${sparsity_values[@]};
+
+for (( n=$n_start; n<=$n_end; n+=$n_step ))
 do
-	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-	./naive_mm_test 	$n $n $n $sp $trials $warmups $sparsity_pattern naive $FILE
-	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
-	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
-
+	for sp in ${sparsity_values[@]};
+	do
+		./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
+		# ./naive_mm_test 	$n $n $n $sp $trials $warmups $sparsity_pattern naive $FILE
+		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
+		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
+	done
 done
-
 # exit 0 # exit without errors
 
-### PLOTS PART ####
+# ### PLOTS PART ####
 
 PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
@@ -87,7 +91,7 @@ nameHype=$unscr$hyperthreading$unscr$person
 cp $FILE $path$time$unscr$FILE$unscr$sparsity_pattern$nameHype
 
 # Call the python plot script with inputs
-python3 plots_comp.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype
+python3 plots_comp_varyN.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype $n_start $n_end $n_step
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"

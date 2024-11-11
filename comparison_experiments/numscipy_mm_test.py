@@ -78,13 +78,12 @@ def generateMatricesAB(M, N, K, sp, algo, sp_pattern):
         else:
             # make a sparse row pattern MxK matrix
             pass
-            
-    
-    # DOES NOT WORK - dimensions af matrices in MM don't align    
-    # elif sp_pattern == 'column-pattern':
-    #     K_nz_cols = round(d * K)
-    #     sp = 1.0 - (K_nz_cols / K)
-    #     matrix_A = np.random.rand(M, K_nz_cols)
+              
+    elif sp_pattern == 'column-pattern':
+        K_nz_cols = round(d * K)
+        sp = 1.0 - (K_nz_cols / K)
+        matrix_A = np.random.rand(M, K_nz_cols).astype(np.float32)
+        matrix_B = np.random.rand(K_nz_cols,N).astype(np.float32) # dense matrix, but with fitting K-dim
         
     elif sp_pattern == 'random-uniform':
         matrix_A = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr', dtype=np.float32)
@@ -104,7 +103,7 @@ def main(N, M, K, p, sp_raw, trials, warmups, sp_pattern, algo, filename):
         ((algo == 'numpy_csr' and sp_pattern == 'random-uniform') or \
         (algo == 'numpy_arr' and sp_pattern == 'random-uniform') or \
         (algo == 'numpy_dia' and sp_pattern == 'diagonal') or \
-        # (algo == 'numpy_dense' and sp_pattern == 'column-pattern') or \
+        (algo == 'numpy_dense' and sp_pattern == 'column-pattern') or \
         (algo == 'numpy_dense' and sp_pattern == 'row-pattern')):
 
         print("The combination of algorithm " + algo + " and sparsity pattern " + sp_pattern + " is not valid")
@@ -112,7 +111,7 @@ def main(N, M, K, p, sp_raw, trials, warmups, sp_pattern, algo, filename):
        
     sp = float(sp_raw)/100
     matrix_A, matrix_B, sp = generateMatricesAB(M, N, K, sp, algo, sp_pattern)
-   
+
     res_total = 0.0
     result = None
     

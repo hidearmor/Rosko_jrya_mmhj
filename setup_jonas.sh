@@ -40,4 +40,5 @@ source ./env.sh
 make -f rosko_kernels.mk
 make
 sudo ldconfig $ROSKO_HOME
+echo $LD_LIBRARY_PATH
 export LD_LIBRARY_PATH
