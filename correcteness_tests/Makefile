@@ -12,13 +12,13 @@ TEST_OBJ_PATH  := .
 CFLAGS_tmp         := $(call get-user-cflags-for,$(CONFIG_NAME))
 
 # Add local header paths to CFLAGS
-CFLAGS_tmp        += -I$(ROSKO_HOME)/include -I$(CAKE_HOME)/include
+CFLAGS_tmp        += -I$(ROSKO_HOME)/include -I$(CAKE_HOME)/include -I$(CNPY_INCLUDE_PATH) # Jonas added this in bashrc subscript
 
 CFLAGS_blis := $(CFLAGS)
 CFLAGS_blis		  += -I$(BLIS_INC_PATH)
 
 # rosko shared library
-LIBS      := -L$(ROSKO_HOME) -lrosko -L$(CAKE_HOME) -lcake
+LIBS      := -L$(ROSKO_HOME) -lrosko -L$(CAKE_HOME) -lcake -L$(CNPY_PATH) -lcnpy # Jonas added this in bashrc subscript
 ROSKO_SRC := $(ROSKO_HOME)/src
 
 

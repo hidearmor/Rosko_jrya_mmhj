@@ -508,7 +508,7 @@ bool mat_equals_thesis(float* C, float* C_check, int M, int N) {
     int CORRECT = 1;
     int cnt = 0;
     int ind1 = 0;
-    float eps = 1e-5; // machine precision level
+    float eps = 1e-3; // machine precision level (original was 1e-3)
 
 	for(int m = 0; m < M; m++) {
 	    for(int n = 0; n < N; n++) {

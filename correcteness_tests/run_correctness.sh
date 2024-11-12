@@ -35,7 +35,7 @@ elif [ "$person" == "jrya" ]; then
     
 	declare -i trials=10
 	declare -i warmups=10
-	declare -i n=
+	declare -i n=1000
 	declare -i cores=6
 
 else
@@ -49,7 +49,7 @@ sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-patt
 sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
-./correctness_test $n $n $n 99 $sparsity_pattern $cores
+./correctness_test $n $n $n 80 $sparsity_pattern $cores
 
 exit 0; ## all below is old
 
