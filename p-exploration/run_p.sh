@@ -25,7 +25,7 @@ fi
 
 echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
 
-# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+# hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 hyperthreading="yesHype"
 person=$1 # argument for who is doing dis
 declare -i trials=15

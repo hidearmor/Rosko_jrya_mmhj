@@ -79,7 +79,7 @@ else
 fi
 
 
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 # algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 algorithms=("rosko" "naive" "numpy_csr" "numpy_arr") 
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment

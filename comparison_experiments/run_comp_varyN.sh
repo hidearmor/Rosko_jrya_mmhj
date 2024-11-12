@@ -88,7 +88,7 @@ else
 
 fi
 
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 declare -i trials=10
 declare -i warmups=10
 declare -i cores=4

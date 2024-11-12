@@ -10,5 +10,5 @@ cd $x;
 echo $ROSKO_HOME;
 echo $CAKE_HOME;
 
-output=$($ROSKO_HOME/hyperthreading.sh)
+output=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 echo "$output"

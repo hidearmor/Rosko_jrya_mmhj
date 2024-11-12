@@ -78,7 +78,7 @@ else
 
 fi
 
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 algorithms=("rosko" "numpy_dia")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]}  # the number of algorithms used in this experiment
 sparsity_pattern="diagonal"  # options: random-uniform, diagonal, row-pattern, column-pattern

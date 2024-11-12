@@ -17,7 +17,7 @@ make;
 # Set the "person" variable based on the first argument
 person=$1
 
-hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 
 # Perform different actions based on the value of "person"
 if [ "$person" == "mmhj" ]; then
