@@ -28,7 +28,7 @@ echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
 # hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
 hyperthreading="yesHype"
 person=$1 # argument for who is doing dis
-declare -i trials=10
+declare -i trials=15
 declare -i warmups=5
 declare -i n=4000
 type="random" # options: random_csr, random_arr, diagonal
