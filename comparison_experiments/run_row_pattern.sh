@@ -39,18 +39,47 @@ fi
 
 echo "algo,p,sp,M,K,N,sppattern,time,n,ntrials" >> $FILE
 
-# Experiment parameters setup
-# declare -i trials=2
-# declare -i warmups=1
-# declare -i n=256
-# declare -i cores=4
-# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
-hyperthreading="noHype"
-person=$1 # argument for who is doing dis
-declare -i trials=10
-declare -i warmups=10
-declare -i n=2000
-declare -i cores=4
+# Check if the "person" argument is provided
+if [ -z "$1" ]; then
+    echo "Error: No argument provided. Please specify who is running the experiment (e.g., mmhj or jrya)."
+    exit 1  # Exit the script if no argument is provided
+fi
+
+# Set the "person" variable based on the first argument
+person=$1
+
+# Perform different actions based on the value of "person"
+if [ "$person" == "mmhj" ]; then
+
+    echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
+    
+	declare -i trials=10
+	declare -i warmups=10
+	declare -i n=2000
+	declare -i cores=4
+
+elif [ "$person" == "jrya" ]; then
+
+    echo "Running as jrya - Setting specific experiment parameters for jrya computer"
+    
+	declare -i trials=10
+	declare -i warmups=10
+	declare -i n=2000
+	declare -i cores=4
+
+else
+
+    echo "Running as another user - Applying general settings"
+	
+	declare -i trials=1
+	declare -i warmups=1
+	declare -i n=512
+	declare -i cores=1
+
+fi
+
+
+hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
 algorithms=("rosko" "numpy_dense")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]}  # the number of algorithms used in this experiment
 sparsity_pattern="row-pattern"  # options: random-uniform, diagonal, row-pattern, column-pattern
