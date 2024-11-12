@@ -14,13 +14,34 @@ echo $CAKE_HOME;
 make clean;
 make;
 
-# variables
-# hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
-person=$1 # argument for who is doing dis
-# declare -i trials=10
-# declare -i warmups=10
-declare -i n=4000
-declare -i cores=300
+# Set the "person" variable based on the first argument
+person=$1
+
+hyperthreading=$($ROSKO_HOME/hyperthreading.sh)
+
+# Perform different actions based on the value of "person"
+if [ "$person" == "mmhj" ]; then
+
+    echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
+    
+	declare -i trials=10
+	declare -i warmups=10
+	declare -i n=2000
+	declare -i cores=4
+
+elif [ "$person" == "jrya" ]; then
+
+    echo "Running as jrya - Setting specific experiment parameters for jrya computer"
+    
+	declare -i trials=10
+	declare -i warmups=10
+	declare -i n=
+	declare -i cores=6
+
+else
+	$ROSKO_HOME/thesis_utils/wrong_user.sh
+	exit 2;
+fi
 
 # algorithms=("rosko" "naive")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 # num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
