@@ -68,10 +68,10 @@ elif [ "$person" == "jrya" ]; then
     
 	declare -i trials=10
 	declare -i warmups=10
-	declare -i cores=4
+	declare -i cores=6
 	n_start=512
 	# n_end=2048
-	n_end=4096
+	n_end=6144
 	# n_end=10240
 	n_step=512
 
