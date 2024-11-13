@@ -1,4 +1,1 @@
 algo,p,sp,M,K,N,sppattern,time,ntrials
-rosko,4,97.006454,2000,2000,2000,random-uniform,0.015132,10
-numpy_csr,4,97.0,2000,2000,2000,random-uniform,0.045726,10
-numpy_arr,4,97.0,2000,2000,2000,random-uniform,0.041109,10
