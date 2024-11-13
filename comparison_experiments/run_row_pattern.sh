@@ -62,10 +62,10 @@ elif [ "$person" == "jrya" ]; then
 
     echo "Running as jrya - Setting specific experiment parameters for jrya computer"
     
-	declare -i trials=10
+	declare -i trials=30
 	declare -i warmups=10
-	declare -i n=6144
-	# 8192
+	# declare -i n=6144
+	declare -i n=8192
 	declare -i cores=6
 
 else

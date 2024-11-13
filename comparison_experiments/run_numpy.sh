@@ -62,10 +62,10 @@ elif [ "$person" == "jrya" ]; then
 
     echo "Running as jrya - Setting specific experiment parameters for jrya computer"
     
-	declare -i trials=10
+	declare -i trials=30
 	declare -i warmups=10
-	declare -i n=6144
-	# 8192
+	# declare -i n=6144
+	declare -i n=8192
 	declare -i cores=6
 
 else
@@ -86,8 +86,8 @@ num_algorithms=${#algorithms[@]} # the number of algorithms used in this experim
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
 # sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
 # sparsity_values=(99 99.5 99.8 99.9)
-sparsity_values=(97 98 99 99.5 99.8 99.9)
-# sparsity_values=(60 70 80 90 95 98 99 99.9)
+# sparsity_values=(97 98 99 99.5 99.8 99.9)
+sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 
