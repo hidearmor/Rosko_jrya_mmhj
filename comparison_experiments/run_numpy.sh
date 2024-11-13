@@ -66,7 +66,8 @@ elif [ "$person" == "jrya" ]; then
 	declare -i warmups=10
 	# declare -i n=6144
 	declare -i n=8192
-	declare -i cores=6
+	# declare -i cores=6
+	declare -i cores=40
 
 else
 
