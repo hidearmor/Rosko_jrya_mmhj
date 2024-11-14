@@ -23,26 +23,31 @@ else
     echo "File '$FILE' does not exist."
 fi
 
-echo "algo,p,sp,N,rosko-time,outer-time,ntrials, measured" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,rosko-time,outer-time,ntrials,measure" >> $FILE
 
 # hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 hyperthreading="yesHype"
 person=$1 # argument for who is doing dis
-declare -i trials=15
-declare -i warmups=5
-declare -i n=4000
-type="random" # options: random_csr, random_arr, diagonal
+declare -i trials=1
+declare -i warmups=1
+# declare -i trials=15
+# declare -i warmups=5
+declare -i n=2000
+# declare -i n=4000
+sparsity_pattern="random-uniform" # options: random_csr, random_arr, diagonal
 
 # not sure if this one makes any difference
 # export GOMP_CPU_AFFINITY="0 1 2 3 4 5 6 7 8 9";
 
 for measure in all packing mm;
-do
-	for p in 1 2 3 4 5 6 10 14 20 40 50 75 100 125 150 175 200 225 250 275 300 350 600 1000 10000;
+do	
+	for p in 1 2 3 4 5 6 10;
+	# for p in 1 2 3 4 5 6 10 14 20 40 50 75 100 125 150 175 200 225 250 275 300 350 600 1000 10000;
 	# for p in 225 230 235 240 245 250 255 260 265 270;
 	# for p in 100000;
 	do
-		./rosko_sgemm_test 	$n $n $n $p 80 $trials $warmups rosko $FILE $measure
+		# ./rosko_sgemm_test 	$n $n $n $p 80 $trials $warmups rosko $FILE $measure
+		./rosko_sgemm_test $n $n $n $p 80 $trials $warmups $sparsity_pattern rosko $FILE $measure
 	done
 done
 
@@ -62,7 +67,7 @@ time=$(echo "$output" | sed -n '2p')
 unscr="_"
 nameHype=$unscr$hyperthreading$unscr$person
 
-cp $FILE $path$time$unscr$FILE$unscr$type$nameHype
+cp $FILE $path$time$unscr$FILE$unscr$sparsity_pattern$nameHype
 
 # python3 plots.py
 
