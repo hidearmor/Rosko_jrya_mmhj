@@ -89,7 +89,7 @@ sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values 
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 # Loop over ps to build the algorithms array
-for p in "${ps[@]}"; 
+for p in ${ps[@]}; 
 do
     algorithms+=("rosko_p=$p")
 done
