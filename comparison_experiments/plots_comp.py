@@ -23,7 +23,7 @@ ALLOWED_SPARSITY_PATTERNS = ['random-uniform',
                              'diagonal', 
                              'column-pattern'] # If changed, then update makeTitle()
 
-DEBUG = False
+DEBUG = True
 
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -68,7 +68,25 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	plt.show()
 	plt.clf()
 	plt.close('all')
+
+
+def isAlgoValid(algo):
 	
+	# Check if algo is a direct match in ALLOWED_ALGOS_WITH_LABEL
+    if algo in ALLOWED_ALGOS_WITH_LABEL:
+        return "all", True
+    
+    # If not directly valid, check for a split possibility
+    if "_" in algo:
+        first_half, second_half = algo.split("_", 1)  # Split at the first underscore only
+        
+        # Check if the first part is a valid key in ALLOWED_ALGOS_WITH_LABEL
+        if first_half in ALLOWED_ALGOS_WITH_LABEL:
+            return "first half",True
+    
+    # If neither condition is met, return False
+    return "nothing", False
+
  
  
 def makeTitle(sparsity_pattern):
@@ -90,14 +108,24 @@ def makeTitle(sparsity_pattern):
 	return title
 
 
-def makeLabels(algos):
+# def makeLabels(algos):
     
-    labels = []
+#     labels = []
     
-    for algo in algos:
-        labels.append(ALLOWED_ALGOS_WITH_LABEL[algo])
+#     for algo in algos:
+#         labels.append(ALLOWED_ALGOS_WITH_LABEL[algo])
     
-    return labels
+#     return labels
+
+def makeLabel(matchType, algo):
+
+	if matchType == "all":
+		return ALLOWED_ALGOS_WITH_LABEL[algo]
+	if matchType == "first half":
+		first_half, second_half = algo.split("_", 1)  # Split on first underscore only
+		return f"{ALLOWED_ALGOS_WITH_LABEL[first_half]}, with {second_half}"
+	else:
+		raise ValueError(f"There is no valid label for algorithm {algo}.")
 
 
 def main():
@@ -113,13 +141,22 @@ def main():
 	# Read the algorithms used in the experiment and write them in algos array
 	num_algos = int(sys.argv[2])
 	algos = []
+	labels = []
 
 	for i in range(num_algos):
 		algo = sys.argv[3+i]
-		if algo not in ALLOWED_ALGOS_WITH_LABEL.keys():
-			print(algo + " is not a valid algorithm\n")
-			sys.exit()
-		algos.append(algo)
+		matchType, isValid = isAlgoValid(algo)
+		if isValid:
+			algos.append(algo)
+			label = makeLabel(matchType, algo)
+			labels.append(label)
+		else:
+			raise ValueError(f"Algorithm '{algo}' is not allowed.")
+
+		# if algo not in ALLOWED_ALGOS_WITH_LABEL.keys():
+		# 	print(algo + " is not a valid algorithm\n")
+		# 	sys.exit()
+		# algos.append(algo)
 
 	# Read the sparsity values used in experiment and write them in sparsities array
 	num_sparsities = int(sys.argv[3+num_algos])
@@ -137,8 +174,8 @@ def main():
 	# Define part of the plot-title depending on the sparsity pattern
 	title = makeTitle(sparsity_pattern)
 
-	# Define the labels array based on the algorithms used in experiment
-	labels = makeLabels(algos)
+	# # Define the labels array based on the algorithms used in experiment
+	# labels = makeLabels(algos)
  
 	if DEBUG:
 		print(sparsity_pattern, algos, sparsities, labels)
