@@ -23,7 +23,7 @@ ALLOWED_SPARSITY_PATTERNS = ['random-uniform',
                              'diagonal', 
                              'column-pattern'] # If changed, then update makeTitle()
 
-DEBUG = True
+DEBUG = False
 
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -43,16 +43,26 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	file_path = Path('./' + results_fname)
 	creation_datetime = datetime.datetime.fromtimestamp(file_path.stat().st_ctime)
 	plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
-	
-	
+
+
 	plt.figure(figsize = (6,4))
 	for i in range(len(sparsities)):
 		for j in range(len(algos)):
-			algo_time = dft[(dft['algo'] == algos[j]) & (round(dft['sp']) == int(sparsities[i]))]['time'].values
-			plt.plot(ns, algo_time, label = ("%s, %s%%" % (labels[j], sparsities[i])), marker = markers[i], color = colors[j])
-	
+			if DEBUG:
+				print(dft.dtypes)
+				print(type(algos[j]))
+				print(type(sparsities[i]))
+			
+			algo_time = dft[(dft['algo'] == algos[j]) & (round(dft['sp'], 1) == float(sparsities[i]))]['time'].values
 
-	# plt.ticklabel_format(useOffset=False, style='plain')
+			if DEBUG:
+				print("Algo:", algos[j], "Sparsity:", sparsities[i], "Filtered times:", algo_time)
+				
+			if len(algo_time) > 0:
+				plt.plot(ns, algo_time, label = ("%s, %s%%" % (labels[j], sparsities[i])), marker = markers[i], color = colors[j])
+			else:
+				print(f"No data for algorithm {algos[j]} with sparsity {sparsities[i]}")
+
 	plt.title('SpMM runtime at various N,\nusing ' + title, fontsize = 18 )
 	plt.xlabel("N", fontsize = 16)
 	plt.ylabel("Runtime (sec)", fontsize = 16)
@@ -69,7 +79,6 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	plt.clf()
 	plt.close('all')
 	
- 
  
 def makeTitle(sparsity_pattern):
     

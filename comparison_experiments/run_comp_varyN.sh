@@ -83,7 +83,8 @@ else
 	declare -i warmups=1
 	declare -i cores=1
 	n_start=512
-	n_end=1536
+	n_end=1024
+	# n_end=1536
 	n_step=512
 
 fi
@@ -95,12 +96,12 @@ hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 algorithms=("rosko" "numpy_csr" "numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-# sparsity_values=(70 85 99)  # Define sparsity values as an array
-sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
+sparsity_values=(70 85 99)  # Define sparsity values as an array, I WOULD ADVISE MAX 4
+# sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 
-for (( n=$n_start; n<=$n_end; n+=$n_step ))
+for (( n=$n_start; n<=$n_end; n+=$n_step ));
 do
 	for sp in ${sparsity_values[@]};
 	do
