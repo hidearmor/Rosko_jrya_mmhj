@@ -23,7 +23,7 @@ ALLOWED_SPARSITY_PATTERNS = ['random-uniform',
                              'diagonal', 
                              'column-pattern'] # If changed, then update makeTitle()
 
-DEBUG = True
+DEBUG = False
 
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -88,7 +88,6 @@ def isAlgoValid(algo):
     return "nothing", False
 
  
- 
 def makeTitle(sparsity_pattern):
     
 	title = ""
@@ -107,15 +106,6 @@ def makeTitle(sparsity_pattern):
 
 	return title
 
-
-# def makeLabels(algos):
-    
-#     labels = []
-    
-#     for algo in algos:
-#         labels.append(ALLOWED_ALGOS_WITH_LABEL[algo])
-    
-#     return labels
 
 def makeLabel(matchType, algo):
 
@@ -153,11 +143,6 @@ def main():
 		else:
 			raise ValueError(f"Algorithm '{algo}' is not allowed.")
 
-		# if algo not in ALLOWED_ALGOS_WITH_LABEL.keys():
-		# 	print(algo + " is not a valid algorithm\n")
-		# 	sys.exit()
-		# algos.append(algo)
-
 	# Read the sparsity values used in experiment and write them in sparsities array
 	num_sparsities = int(sys.argv[3+num_algos])
 	sparsities = []
@@ -174,8 +159,6 @@ def main():
 	# Define part of the plot-title depending on the sparsity pattern
 	title = makeTitle(sparsity_pattern)
 
-	# # Define the labels array based on the algorithms used in experiment
-	# labels = makeLabels(algos)
  
 	if DEBUG:
 		print(sparsity_pattern, algos, sparsities, labels)
