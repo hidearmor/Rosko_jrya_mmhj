@@ -101,7 +101,8 @@ def makeTitle(sparsity_pattern):
 	elif sparsity_pattern=='column-pattern':
 		title = "column-pattern sparse matrices"
 	else:
-		print(sparsity_pattern + " is not a valid type of sparsity pattern\n")
+		# print(sparsity_pattern + " is not a valid type of sparsity pattern\n")
+		raise ValueError(f"Sparsity pattern '{sparsity_pattern}' is not allowed.")
 		sys.exit()
 
 	return title
@@ -125,7 +126,8 @@ def main():
     # Read the type of sparsity pattern from input
 	sparsity_pattern = sys.argv[1]
 	if sparsity_pattern not in ALLOWED_SPARSITY_PATTERNS:
-		print(sparsity_pattern + " is not a valid type of sparsity pattern\n")
+		# print(sparsity_pattern + " is not a valid type of sparsity pattern\n")
+		raise ValueError(f"Sparsity pattern '{sparsity_pattern}' is not allowed.")
 		sys.exit()
 
 	# Read the algorithms used in the experiment and write them in algos array
