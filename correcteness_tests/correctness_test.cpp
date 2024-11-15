@@ -8,7 +8,7 @@
 // need to install this package: cnpy
 // python file conversion part written with help from chat GPT
 // https://github.com/rogersce/cnpy?tab=readme-ov-file
-// not: make install step in instructions should be called in sudo mode
+// note: make install step in instructions should be called in sudo mode
 
 void save_matrix_to_npy(const std::string& filename, float* matrix, unsigned long rows, unsigned long cols) {
     cnpy::npy_save(filename, matrix, {rows, cols}, "w");
