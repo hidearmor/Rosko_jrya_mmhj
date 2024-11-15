@@ -38,6 +38,15 @@ elif [ "$person" == "jrya" ]; then
 	declare -i n=1000
 	declare -i cores=6
 
+elif [ "$person" == "guest" ]; then
+
+    echo "Running as jrya - Setting specific experiment parameters for jrya computer"
+    
+	declare -i trials=1
+	declare -i warmups=1
+	declare -i n=100
+	declare -i cores=6
+
 else
 	$ROSKO_HOME/thesis_utils/wrong_user.sh
 	exit 2;

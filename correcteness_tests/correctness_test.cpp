@@ -9,6 +9,9 @@
 // python file conversion part written with help from chat GPT
 // https://github.com/rogersce/cnpy?tab=readme-ov-file
 // note: make install step in instructions should be called in sudo mode
+// then I've set this in my profile, (they are called in Makefil in this folder):
+    // export CNPY_PATH=/usr/local/lib
+    // export CNPY_INCLUDE_PATH=/usr/local/lib/include
 
 void save_matrix_to_npy(const std::string& filename, float* matrix, unsigned long rows, unsigned long cols) {
     cnpy::npy_save(filename, matrix, {rows, cols}, "w");
@@ -173,7 +176,18 @@ int main(int argc, char** argv) {
     sp_pattern = std::string(argv[5]);
     p = atof(argv[6]);
 
-    manual_test(M, N, K, p, alg, sp_pattern, sp, actual_sp);
+    // manual_test(M, N, K, p, alg, sp_pattern, sp, actual_sp);
+    float* A = nullptr;
+    float* B = nullptr;
+
+    // Initialize the matrices
+    initialize_matrices(A, B, M, K, N, sp, sp_pattern, actual_sp);
+
+    float* C_rosko = (float*) calloc(M * N , sizeof( float ));
+    float* C_naive = (float*) calloc(M * N , sizeof( float ));
+    rosko(A, B, C_rosko, M, N, K, ((100.0 - actual_sp * 100.0) / 100.0), p, alg);
+    naive(A, B, C_naive, M, N, K);
+    printf("\nshould be true: %d\n", mat_equals_thesis(C_rosko, C_naive, M, N));
 
     return 0;
 }
