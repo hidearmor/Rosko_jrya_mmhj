@@ -100,7 +100,7 @@ std::vector<Triplet> generateShapes(int maxDimSize) {
     int minDimSize = 200;
 
     // Determine the number of shapes to generate (between 5 and 10)
-    int numShapes = std::max(5, std::min(10, maxDimSize / minDimSize));
+    int numShapes = std::max(5, std::min(8, maxDimSize / minDimSize));
 
     // Create a non-linear distribution for sizes
     std::vector<int> sizes;

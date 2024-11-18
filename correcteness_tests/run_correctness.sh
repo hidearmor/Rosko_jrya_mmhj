@@ -17,10 +17,10 @@ make;
 person=$1
 
 # variables
-declare -i maxDims=10000
+declare -i maxDims=8000
 sparsity_patterns=("random-uniform" "row-pattern" "column-pattern" "diagonal")
-p_values=(1, 6, 40, 200)
-sparsity_values=(0 60 70 80 90 95 98 99 99.9)
+p_values=(6, 40, 200)
+sparsity_values=(0 30 60 90 99.9 100)
 # sparsity_patterns=("row-pattern")
 # p_values=(6)
 # sparsity_values=(50)
