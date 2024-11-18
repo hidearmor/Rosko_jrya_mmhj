@@ -45,6 +45,7 @@ int get_num_physical_cores() {
 	fp = popen(command3, "r");
 
 	if (fp == NULL) {
+		// riiight here Jonas
 		printf("Failed to run lscpu | grep Socket command\n" );
 		exit(1);
 	}

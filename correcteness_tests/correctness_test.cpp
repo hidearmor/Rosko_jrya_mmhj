@@ -90,28 +90,28 @@ float* naive(float* A, float* B, int M, int N, int K) {
     return C;
 }
 
-using Triplet = std::tuple<int, int, int>;
+struct Triplet {
+    int M, N, K;
+    Triplet(int m, int n, int k) : M(m), N(n), K(k) {}
+};
 
 std::vector<Triplet> generateShapes(int maxDimSize) {
     std::vector<Triplet> shapes;
-    int minDimSize = 100;
+    int minDimSize = 200;
 
     // Determine the number of shapes to generate (between 5 and 10)
     int numShapes = std::max(5, std::min(10, maxDimSize / minDimSize));
 
-    // Generate evenly spaced values between minDimSize and maxDimSize
-    int step = (maxDimSize - minDimSize) / numShapes;
-
-    // Ensure step is at least 1 to avoid division by zero
-    if (step < 1) step = 1;
-
-    // Create a list of candidate sizes
+    // Create a non-linear distribution for sizes
     std::vector<int> sizes;
-    for (int i = minDimSize; i <= maxDimSize; i += step) {
-        sizes.push_back(i);
+    for (int i = 0; i < numShapes; ++i) {
+        // Use quadratic scaling to distribute sizes more densely at the lower range
+        float factor = static_cast<float>(i) / (numShapes - 1); // range from 0 to 1
+        int size = minDimSize + static_cast<int>((maxDimSize - minDimSize) * (factor * factor));
+        sizes.push_back(size);
     }
 
-    // Generate shapes using combinations of the candidate sizes
+    // Generate shapes using combinations of the non-linearly distributed sizes
     for (int i = 0; i < numShapes; ++i) {
         int m = sizes[i % sizes.size()];
         int n = sizes[(i + 1) % sizes.size()];
@@ -127,6 +127,7 @@ std::vector<Triplet> generateShapes(int maxDimSize) {
 
     return shapes;
 }
+
 
 float* changeSingleElement(float* M, int size) {
     float* M_copy = (float*) malloc(size * sizeof(float));
@@ -155,22 +156,24 @@ float* changeSingleRow(float* M, int rows, int cols) {
 }
 
 bool check_matrices_equal(float* C1, float* C2, int M, int N, const std::string& name1, const std::string& name2, std::string expected) {
-    if (mat_equals_thesis(C1, C2, M, N) != 0) {
+    bool res = mat_equals_thesis(C1, C2, M, N);
+    if ((res == 1 && expected == "identical") || (res == 0 && expected == "different")) {
         std::cerr << "Error: Matrices " << name1 << " and " << name2 << " should be " << expected << std::endl;
-        return false; // Error encountered, stop execution
+        return false;
     }
     return true;
 }
 
 void printSpecs(int M, int N, int K, float sp, std::string sp_pattern, int p) {
-    printf("\nspecs: M %d, N %d,, K %d, sp %f, sp_pattern: %s, p %d\n", M, N, K, sp, sp_pattern.c_str(), p );
+    printf("\nspecs: M %d, N %d, K %d, sp %f, sp_pattern: %s, p %d", M, N, K, sp, sp_pattern.c_str(), p );
 }
 
 bool runAllTests(int M, int N, int K, float sp_init, std::string sp_pattern, int p)
 {
+    bool debugPrint = false;
     float actual_sp;
     int alg;
-    bool result = 1;
+    bool result = false; // set to true after all checks
 
     float* A1 = nullptr;
     float* B1 = nullptr;
@@ -182,9 +185,13 @@ bool runAllTests(int M, int N, int K, float sp_init, std::string sp_pattern, int
     initialize_matrices(A1, B1, M, K, N, sp_init, sp_pattern, actual_sp);
     initialize_matrices(A2, B2, M, K, N, sp_init, sp_pattern, actual_sp);
 
+    if (debugPrint) printf("\ninit normals");
+
     int sizeA = M * K;
     A1elem = changeSingleElement(A1, sizeA);
     A1row = changeSingleRow(A1, M, K);
+    
+    if (debugPrint) printf("\ninit copies");
 
     float sp = actual_sp *100.0;
     float density = (100.0 - actual_sp * 100.0) / 100.0;
@@ -209,44 +216,51 @@ bool runAllTests(int M, int N, int K, float sp_init, std::string sp_pattern, int
     float* C_2_numpy =       numpy(A2, B2, M, N, K);
     float* C_2_naive =       naive(A2, B2, M, N, K);
     
-    // to know where we are if it goes wrong
-    printSpecs(M, N, K, sp, sp_pattern, p);
+    if (debugPrint) printf("\ndid mm");
 
-    // does it test with correct input?
-    if (!check_matrices_equal(C_1_rosko, C_1_rosko, M, N, "C_1_rosko", "C_1_rosko", "identical")) return false;
+    while (result == false)
+    {
+        // does it test with correct input?
+        if (!check_matrices_equal(C_1_rosko, C_1_rosko, M, N, "C_1_rosko", "C_1_rosko", "identical")) break;
+        if (!check_matrices_equal(C_1_numpy, C_1_numpy, M, N, "C_1_numpy", "C_1_numpy", "identical")) break;
 
-    // Group 1: C_1_*
-    if (!check_matrices_equal(C_1_rosko, C_1_numpy, M, N, "C_1_rosko", "C_1_numpy", "identical")) return false;
-    if (!check_matrices_equal(C_1_rosko, C_1_naive, M, N, "C_1_rosko", "C_1_naive", "identical")) return false;
-    if (!check_matrices_equal(C_1_numpy, C_1_naive, M, N, "C_1_numpy", "C_1_naive", "identical")) return false;
+        // Group 1: C_1_*
+        if (!check_matrices_equal(C_1_rosko, C_1_numpy, M, N, "C_1_rosko", "C_1_numpy", "identical")) break;
+        if (!check_matrices_equal(C_1_rosko, C_1_naive, M, N, "C_1_rosko", "C_1_naive", "identical")) break;
+        if (!check_matrices_equal(C_1_numpy, C_1_naive, M, N, "C_1_numpy", "C_1_naive", "identical")) break;
 
-    // Group 2: Identical input, two processes
-    if (!check_matrices_equal(C_1_rosko, C_1_rosko_copy, M, N, "C_1_rosko", "C_1_rosko_copy", "identical")) return false;
-    if (!check_matrices_equal(C_1_numpy, C_1_numpy_copy, M, N, "C_1_numpy", "C_1_numpy_copy", "identical")) return false;
-    if (!check_matrices_equal(C_1_naive, C_1_naive_copy, M, N, "C_1_naive", "C_1_naive_copy", "identical")) return false;
+        // Group 2: Identical input, two different variables and MM processes
+        if (!check_matrices_equal(C_1_rosko, C_1_rosko_copy, M, N, "C_1_rosko", "C_1_rosko_copy", "identical")) break;
+        if (!check_matrices_equal(C_1_numpy, C_1_numpy_copy, M, N, "C_1_numpy", "C_1_numpy_copy", "identical")) break;
+        if (!check_matrices_equal(C_1_naive, C_1_naive_copy, M, N, "C_1_naive", "C_1_naive_copy", "identical")) break;
 
-    // Group 5: C_2_*
-    if (!check_matrices_equal(C_2_rosko, C_2_numpy, M, N, "C_2_rosko", "C_2_numpy", "identical")) return false;
-    if (!check_matrices_equal(C_2_rosko, C_2_naive, M, N, "C_2_rosko", "C_2_naive", "identical")) return false;
-    if (!check_matrices_equal(C_2_numpy, C_2_naive, M, N, "C_2_numpy", "C_2_naive", "identical")) return false;
+        // Group 5: Identical input, are 2's also identical?
+        if (!check_matrices_equal(C_2_rosko, C_2_numpy, M, N, "C_2_rosko", "C_2_numpy", "identical")) break;
+        if (!check_matrices_equal(C_2_rosko, C_2_naive, M, N, "C_2_rosko", "C_2_naive", "identical")) break;
+        if (!check_matrices_equal(C_2_numpy, C_2_naive, M, N, "C_2_numpy", "C_2_naive", "identical")) break;
 
-    // // Group 3: change row, should be FALE
-    // if (check_matrices_equal(C_1row_rosko, C_1_rosko, M, N, "C_1row_rosko", "C_1_rosko", "diffent")) return false;
-    // if (check_matrices_equal(C_1row_naive, C_1_naive, M, N, "C_1row_naive", "C_1_naive", "diffent")) return false;
-    // if (check_matrices_equal(C_1row_numpy, C_1_numpy, M, N, "C_1row_numpy", "C_1_numpy", "diffent")) return false;
+        // // Group 3: change row, should be different
+        if (!check_matrices_equal(C_1row_rosko, C_1_rosko, M, N, "C_1row_rosko", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_1row_naive, C_1_naive, M, N, "C_1row_naive", "C_1_naive", "different")) break;
+        if (!check_matrices_equal(C_1row_numpy, C_1_numpy, M, N, "C_1row_numpy", "C_1_numpy", "different")) break;
 
-    // // Group 4: changed element, should be diferent
-    // if (check_matrices_equal(C_1elem_rosko, C_1_rosko, M, N, "C_1elem_rosko", "C_1_rosko", "different")) return false;
-    // if (check_matrices_equal(C_1elem_naive, C_1_naive, M, N, "C_1elem_naive", "C_1_naive", "different")) return false;
-    // if (check_matrices_equal(C_1elem_numpy, C_1_numpy, M, N, "C_1elem_numpy", "C_1_numpy", "different")) return false;
+        // // Group 4: changed element, should be different
+        if (!check_matrices_equal(C_1elem_rosko, C_1_rosko, M, N, "C_1elem_rosko", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_1elem_naive, C_1_naive, M, N, "C_1elem_naive", "C_1_naive", "different")) break;
+        if (!check_matrices_equal(C_1elem_numpy, C_1_numpy, M, N, "C_1elem_numpy", "C_1_numpy", "different")) break;
 
-    // // Group 5: C_2_*
-    // if (check_matrices_equal(C_2_rosko, C_1_numpy, M, N, "C_2_rosko", "C_1_numpy", "different")) return false;
-    // if (check_matrices_equal(C_2_naive, C_1_rosko, M, N, "C_2_naive", "C_1_rosko", "different")) return false;
-    // if (check_matrices_equal(C_2_numpy, C_1_naive, M, N, "C_2_numpy", "C_1_naive", "different")) return false;
-    // if (check_matrices_equal(C_2_rosko, C_1_rosko, M, N, "C_2_rosko", "C_1_rosko", "different")) return false;
-    // if (check_matrices_equal(C_2_naive, C_1_naive, M, N, "C_2_naive", "C_1_naive", "different")) return false;
-    // if (check_matrices_equal(C_2_numpy, C_1_numpy, M, N, "C_2_numpy", "C_1_numpy", "different")) return false;
+        // // Group 5: plain different, should be different
+        if (!check_matrices_equal(C_2_rosko, C_1_numpy, M, N, "C_2_rosko", "C_1_numpy", "different")) break;
+        if (!check_matrices_equal(C_2_naive, C_1_rosko, M, N, "C_2_naive", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_2_numpy, C_1_naive, M, N, "C_2_numpy", "C_1_naive", "different")) break;
+        if (!check_matrices_equal(C_2_rosko, C_1_rosko, M, N, "C_2_rosko", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_2_naive, C_1_naive, M, N, "C_2_naive", "C_1_naive", "different")) break;
+        if (!check_matrices_equal(C_2_numpy, C_1_numpy, M, N, "C_2_numpy", "C_1_numpy", "different")) break;
+
+        result = true;
+    }
+
+    if (debugPrint) printf("\nchecked");
 
     free(A1);
     free(B1);
@@ -270,153 +284,151 @@ bool runAllTests(int M, int N, int K, float sp_init, std::string sp_pattern, int
     free(C_2_numpy);
     free(C_2_naive);
 
+    if (debugPrint) printf("\nfreed\n");
+
     return result;
 }
 
-void correctnessSuite(int maxDimSize)
+bool runAllTestsWihtouNaive(int M, int N, int K, float sp_init, std::string sp_pattern, int p)
 {
-    float sparsities[7] = {0.0f, 30.0f, 50.0f, 70.0f, 90.0f, 99.0f, 100.0f};
-    // float sparsities[2] = {70.0f, 90.0f};
-    // int pRange[5] = {1, 4, 6, 49, 231};
-    int pRange[2] = {6, 49};
-    std::string sp_patterns[1] = {"diagonal"};
-    // std::string sp_patterns[1] = {"column-pattern"};
-    // std::string sp_patterns[1] = {"row-pattern"};
-    // std::string sp_patterns[1] = {"random-uniform"};
-    // std::string sp_patterns[4] = {"random-uniform", "row-pattern", "column-pattern", "diagonal"};
-    // std::string sp_patterns[3] = {"random-uniform", "row-pattern", "column-pattern"};
-    // std::string sp_patterns[1] = {"column-pattern"};
-    // std::string sp_patterns[1] = {"row-pattern"};
-    std::vector<Triplet> shapes = generateShapes(maxDimSize);
+    bool debugPrint = false;
+    float actual_sp;
+    int alg;
+    bool result = false; // set to true after all checks
 
-    bool result = 1;
+    float* A1 = nullptr;
+    float* B1 = nullptr;
+    float* A1elem = nullptr;
+    float* A1row = nullptr;
+    float* A2 = nullptr;
+    float* B2 = nullptr;
 
-    for (const auto& [M, N, K] : shapes) {
-        printf("\nm %d, n %d, k %d\n", M, N, K);
+    initialize_matrices(A1, B1, M, K, N, sp_init, sp_pattern, actual_sp);
+    initialize_matrices(A2, B2, M, K, N, sp_init, sp_pattern, actual_sp);
+
+    if (debugPrint) printf("\ninit normals");
+
+    int sizeA = M * K;
+    A1elem = changeSingleElement(A1, sizeA);
+    A1row = changeSingleRow(A1, M, K);
+    
+    if (debugPrint) printf("\ninit copies");
+
+    float sp = actual_sp *100.0;
+    float density = (100.0 - actual_sp * 100.0) / 100.0;
+    
+    float* C_1_rosko =       rosko(A1, B1, M, N, K, density, p, alg);
+    float* C_1_numpy =       numpy(A1, B1, M, N, K);
+    
+    float* C_1_rosko_copy =  rosko(A1, B1, M, N, K, density, p, alg);
+    float* C_1_numpy_copy =  numpy(A1, B1, M, N, K);
+
+    float* C_1row_rosko =    rosko(A1row, B1, M, N, K, density, p, alg);
+    float* C_1row_numpy =    numpy(A1row, B1, M, N, K);
+
+    float* C_1elem_rosko =   rosko(A1elem, B1, M, N, K, density, p, alg);
+    float* C_1elem_numpy =   numpy(A1elem, B1, M, N, K);
+
+    float* C_2_rosko =       rosko(A2, B2, M, N, K, density, p, alg);
+    float* C_2_numpy =       numpy(A2, B2, M, N, K);
+    
+    if (debugPrint) printf("\ndid mm");
+
+    while (result == false)
+    {
+        // does it test with correct input?
+        if (!check_matrices_equal(C_1_rosko, C_1_rosko, M, N, "C_1_rosko", "C_1_rosko", "identical")) break;
+        if (!check_matrices_equal(C_1_numpy, C_1_numpy, M, N, "C_1_numpy", "C_1_numpy", "identical")) break;
+
+        // Group 1: C_1_*
+        if (!check_matrices_equal(C_1_rosko, C_1_numpy, M, N, "C_1_rosko", "C_1_numpy", "identical")) break;
+
+        // Group 2: Identical input, two different variables and MM processes
+        if (!check_matrices_equal(C_1_rosko, C_1_rosko_copy, M, N, "C_1_rosko", "C_1_rosko_copy", "identical")) break;
+        if (!check_matrices_equal(C_1_numpy, C_1_numpy_copy, M, N, "C_1_numpy", "C_1_numpy_copy", "identical")) break;
+
+        // Group 5: Identical input, are 2's also identical?
+        if (!check_matrices_equal(C_2_rosko, C_2_numpy, M, N, "C_2_rosko", "C_2_numpy", "identical")) break;
+
+        // // Group 3: change row, should be different
+        if (!check_matrices_equal(C_1row_rosko, C_1_rosko, M, N, "C_1row_rosko", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_1row_numpy, C_1_numpy, M, N, "C_1row_numpy", "C_1_numpy", "different")) break;
+
+        // // Group 4: changed element, should be different
+        if (!check_matrices_equal(C_1elem_rosko, C_1_rosko, M, N, "C_1elem_rosko", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_1elem_numpy, C_1_numpy, M, N, "C_1elem_numpy", "C_1_numpy", "different")) break;
+
+        // // Group 5: plain different, should be different
+        if (!check_matrices_equal(C_2_rosko, C_1_numpy, M, N, "C_2_rosko", "C_1_numpy", "different")) break;
+        if (!check_matrices_equal(C_2_rosko, C_1_rosko, M, N, "C_2_rosko", "C_1_rosko", "different")) break;
+        if (!check_matrices_equal(C_2_numpy, C_1_numpy, M, N, "C_2_numpy", "C_1_numpy", "different")) break;
+
+        result = true;
     }
 
+    if (debugPrint) printf("\nchecked");
+
+    free(A1);
+    free(B1);
+    free(A1elem);
+    free(A1row);
+    free(A2);
+    free(B2);
+    free(C_1_rosko);
+    free(C_1_numpy);
+    free(C_1_rosko_copy);
+    free(C_1_numpy_copy);
+    free(C_1row_rosko);
+    free(C_1row_numpy);
+    free(C_1elem_rosko);
+    free(C_1elem_numpy);
+    free(C_2_rosko);
+    free(C_2_numpy);
+
+    if (debugPrint) printf("\nfreed\n");
+
+    return result;
+}
+
+void correctnessSuite(int maxDimSize, float sp_init, std::string sp_pattern, int p)
+{
+    std::vector<Triplet> shapes = generateShapes(maxDimSize);
+    bool result = false;
+
     for (const auto& [M, N, K] : shapes) {
-        for (const int& p : pRange) {
-            for (const float& sp_init : sparsities) {
-                for (const std::string sp_pattern : sp_patterns) {
-                    // some of our matrix building can't handle 100% sparsity
-                    if (
-                        sp_init >= 100.0f &&
-                        (sp_pattern == "diagonal"
-                        || sp_pattern == "column-pattern"
-                        || sp_pattern == "row-pattern")
-                        ) continue;
-                    result = runAllTests(M, N, K, sp_init, sp_pattern, p);
-                    if (result = false) return;
-                }
+        printf("shape: M %d, K %d, N %d\n", M, K, N);
+        if ((sp_init >= 100.0f && sp_pattern == "diagonal")
+            || (sp_init > 99.5f && (sp_pattern == "column-pattern" || sp_pattern == "row-pattern")))
+            {
+                // printf("\nsparsity too high for pattern continuing, pattern %s, sp %f", sp_pattern.c_str(), sp_init);
+                continue;
             }
+        if (maxDimSize < 1000) result = runAllTests(M, N, K, sp_init, sp_pattern, p);
+        else result = runAllTestsWihtouNaive(M, N, K, sp_init, sp_pattern, p);
+        if (result == false)
+        {
+            printf("\n");
+            printSpecs(M, N, K, sp_init, sp_pattern, p);
+            printf("\nERROR somewhere here\n");
+            return;
         }
     }
 
-    printf("\n\nTest succesful! No errors encountered!\n");
+    // printf("\np %d, sp %f, maxDim %d, pattern %s", p, sp_init, maxDimSize, sp_pattern.c_str());
+    // printf("\nTest succesful! No errors encountered!");
 }
 
+
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        printf("Takes int maxDimensions as argument! \n");
+    if (argc < 5) {
+        printf("Params: maxDims, sp, sp_pattern, p \n");
         return -1;
     }
     int maxDims = atoi(argv[1]);
-    correctnessSuite(maxDims);
+    std::string sp_pattern = std::string(argv[2]);
+    int p = atof(argv[3]);
+    float sp_init = atof(argv[4]);
+    correctnessSuite(maxDims, sp_init, sp_pattern, p);
 
     return 0;
 }
-
-// void manual_test(int M, int N, int K, int p, int alg, std::string sp_pattern, float sp, float actual_sp) {
-    
-//     printf("\nn = %d, p = %d, sp = %f, sp_pattern: %s\n", N, p, sp, sp_pattern.c_str());
-
-//     // Variables to hold matrices A and B
-//     float* A = nullptr;
-//     float* B = nullptr;
-
-//     // Initialize the matrices
-//     initialize_matrices(A, B, M, K, N, sp, sp_pattern, actual_sp);
-
-//     // Calculate the density
-//     sp = actual_sp *100.0;
-//     float density = (100.0 - actual_sp * 100.0) / 100.0;
-
-//     float* C_rosko = rosko(A, B, M, N, K, density, p, alg);
-//     float* C_naive = naive(A, B, M, N, K);
-//     float* C_naive_copy = naive(A, B, M, N, K);
-//     float* C_numpy = numpy(A, B, M, N, K);
-
-//     // standard tests
-//     printf("\nstright up rosko naive, CORRECT; same input\n");
-//     mat_equals_thesis(C_rosko, C_naive, M, N);
-
-//     printf("\nCORRECT; same input, naive naive\n");
-//     mat_equals_thesis(C_naive_copy, C_naive, M, N);
-
-//     printf("\nCORRECT; same input, naive numpy\n");
-//     mat_equals_thesis(C_naive, C_numpy, M, N);
-//     printf("\nCORRECT; same input, rosko numpy\n");
-//     mat_equals_thesis(C_rosko, C_numpy, M, N);
-
-
-//     // // Wrongness tests
-//     float* A_2 = nullptr;
-//     float* B_2 = nullptr;
-//     initialize_matrices(A_2, B_2, M, K, N, sp, sp_pattern, actual_sp);
-//     float* C_naive2 = naive(A_2, B_2, M, N, K);
-//     float* C_rosko2 = rosko(A_2, B_2, M, N, K, density, p, alg);
-//     float* C_numpy2 = numpy(A_2, B_2, M, N, K);
-    
-//     printf("\nWRONG; different input, naive naive2\n");
-//     mat_equals_thesis(C_naive, C_naive2, M, N);
-
-//     printf("\nWRONG; different input, rosko & naive2 2\n");
-//     mat_equals_thesis(C_rosko, C_naive2, M, N);
- 
-//     printf("\nWRONG; different input, rosko & rosko2 2\n");
-//     mat_equals_thesis(C_rosko, C_rosko2, M, N);
- 
-//     printf("\nWRONG; different input, numpy & numpy2 2\n");
-//     mat_equals_thesis(C_numpy, C_numpy2, M, N);
- 
-//     printf("\nCORRECT; same input, rosko2 & numpy2\n");
-//     mat_equals_thesis(C_rosko2, C_numpy2, M, N);
- 
-//     free(A_2);
-//     free(B_2);
-//     free(C_naive2);
-//     free(C_rosko2);
-//     free(C_numpy2);
-
-
-//     // Clean up allocated memory from standard
-//     free(A);
-//     free(B);
-//     free(C_rosko);
-//     free(C_naive);
-//     free(C_naive_copy);
-//     free(C_numpy);
-// }
-
-// int old_main(int argc, char** argv) {
-//     int M, K, N, p, alg;
-//     float sp, actual_sp;
-//     std::string sp_pattern;
-
-//     if (argc < 7) {
-//         printf("Usage: %s <M> <K> <N> <sparsity> <pattern>\n", argv[0]);
-//         return -1;
-//     }
-
-//     M = atoi(argv[1]);
-//     K = atoi(argv[2]);
-//     N = atoi(argv[3]);
-//     sp = atof(argv[4]);
-//     sp_pattern = std::string(argv[5]);
-//     p = atof(argv[6]);
-
-//     manual_test(M, N, K, p, alg, sp_pattern, sp, actual_sp);
-
-//     return 0;
-// }
