@@ -31,6 +31,7 @@ do
     do
         for sp in ${sparsity_values[@]}
         do
+            echo "running for: pattern ${pattern} p ${p} sp ${sp}"
             ./correctness_test $maxDims $pattern $p $sp
         done
     done
