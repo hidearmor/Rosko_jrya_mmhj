@@ -7,8 +7,8 @@ int main( int argc, char** argv ) {
 	int M, K, N, p, nz, mr, nr, ntrials, alg, warmup; // alg is only for rosko use
 	struct timespec start, end;
 	double diff_t;
-	float density, sp;
-	std::string filename, algo, measure_r;
+	float density, sp, actual_sp;
+	std::string filename, algo, measure_r, sp_pattern;
 
 	M = atoi(argv[1]); 
 	K = atoi(argv[2]);
@@ -17,9 +17,10 @@ int main( int argc, char** argv ) {
 	sp = atof(argv[5]);
 	ntrials = atoi(argv[6]);
 	warmup = atoi(argv[7]);
-	algo = std::string(argv[8]);
-	filename = std::string(argv[9]);
-	measure_r = std::string(argv[10]);
+	sp_pattern = std::string(argv[8]);
+	algo = std::string(argv[9]);
+	filename = std::string(argv[10]);
+	measure_r = std::string(argv[11]);
 	int measure = 0;
 	if (measure_r == "all") measure = 0;
 	else if (measure_r == "packing") measure = 1;
@@ -37,6 +38,22 @@ int main( int argc, char** argv ) {
     srand(time(NULL)); 
 	rand_sparse(A, M, K, ((float) sp) / 100.0); // init A with random uniform sparsity
 	rand_init(B, K, N); // init B with random nnz
+
+	if (sp_pattern == "random-uniform") {
+		actual_sp = rand_sparse(A, M, K, ((float) sp) / 100.0); // init A with random uniform sparsity
+	} else if (sp_pattern == "row-pattern") {
+		actual_sp = row_pattern_sparse(A, M, K, ((float) sp) / 100.0, -1);
+	} else if (sp_pattern == "column-pattern") {
+		actual_sp = column_pattern_sparse(A, M, K, ((float) sp) / 100.0, -1);
+	} else if (sp_pattern == "diagonal") {
+		actual_sp = diagonal_pattern_sparse(A, M, K, ((float) sp) / 100.0);
+	} else {
+		printf("%s is not a valid sparsity pattern\n", sp_pattern.c_str());
+		return -1;
+	}
+
+	// actual_sp messes up the plot system
+	// sp = actual_sp *100.0;
 
 	// --------- Rosko init (begin) -------------------
 	density = (100.0 - sp) / 100.0;
@@ -96,8 +113,11 @@ int main( int argc, char** argv ) {
 	printf("\n------------------");
 	// printf("\nouter time: %f", myDiff / ntrials);
 	// printf("\nrosko Diff: %f", diff_t / ntrials);
-	printf("\n%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
-	fprintf(fp, "%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
+
+	// printf("\n%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
+	// fprintf(fp, "%s,%d,%f,%d,%f,%f,%d,%s\n", algo.c_str(), p, sp, N, diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
+	printf("/n%s,%d,%f,%d,%d,%d,%s,%f,%f,%d,%s\n", algo.c_str(), p, sp, M, K, N, sp_pattern.c_str(), diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
+	fprintf(fp, "%s,%d,%f,%d,%d,%d,%s,%f,%f,%d,%s\n", algo.c_str(), p, sp, M, K, N, sp_pattern.c_str(), diff_t / ntrials, myDiff / ntrials, ntrials, measure_r.c_str());
 	fclose(fp);
 
 	// cake_sgemm_checker(A, B, C, N, M, K);

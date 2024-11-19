@@ -46,7 +46,8 @@ int main( int argc, char** argv ) {
 		return -1;
 	}
 
-	sp = actual_sp *100.0;
+	// actual_sp messes up the plot system
+	// sp = actual_sp *100.0;
 
 	rand_init(B, K, N); // init B with random nnz
 

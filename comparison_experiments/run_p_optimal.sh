@@ -23,10 +23,10 @@ echo $CAKE_HOME;
 make clean;
 make;
 
-# # filename="results" #Mayas imp
+# filename="results" #Mayas imp
 
-# # check if results exists and if it does, move it
-FILE="results_comp_varyN"
+# check if results exists and if it does, move it
+FILE="results_p_optimal"
 
 # Check if the results file already exists
 if [ -f "$FILE" ]; then
@@ -37,7 +37,7 @@ else
 fi
 
 
-echo "algo,p,sp,M,K,N,sppattern,time,ntrials" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,time,n,ntrials" >> $FILE
 
 # Check if the "person" argument is provided
 if [ -z "$1" ]; then
@@ -55,12 +55,9 @@ if [ "$person" == "mmhj" ]; then
     
 	declare -i trials=10
 	declare -i warmups=10
-	declare -i cores=4
-	n_start=512
-	# n_end=2048
-	n_end=4096
-	# n_end=10240
-	n_step=512
+	declare -i n=2000
+	ps=(4 20)
+	num_ps=${#ps[@]}
 
 elif [ "$person" == "jrya" ]; then
 
@@ -68,12 +65,10 @@ elif [ "$person" == "jrya" ]; then
     
 	declare -i trials=30
 	declare -i warmups=10
-	declare -i cores=6
-	n_start=512
-	# n_end=2048
-	n_end=8192
-	# n_end=10240
-	n_step=512
+	# declare -i n=6144
+	declare -i n=8192
+	ps=(6 40)
+	num_ps=${#ps[@]}
 
 else
 
@@ -81,39 +76,39 @@ else
 	
 	declare -i trials=1
 	declare -i warmups=1
-	declare -i cores=1
-	n_start=512
-	n_end=1024
-	# n_end=1536
-	n_step=512
+	declare -i n=512
+	ps=(4 20)
+	num_ps=${#ps[@]}
 
 fi
 
+
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
-# declare -i trials=10
-# declare -i warmups=10
-# declare -i cores=4
-algorithms=("rosko" "numpy_csr" "numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
-num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-sparsity_values=(70 85 99)  # Define sparsity values as an array, I WOULD ADVISE MAX 4
-# sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
+sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
-
-for (( n=$n_start; n<=$n_end; n+=$n_step ));
+# Loop over ps to build the algorithms array
+for p in ${ps[@]}; 
 do
-	for sp in ${sparsity_values[@]};
+    algorithms+=("rosko_p=$p")
+done
+
+num_algorithms=${#algorithms[@]}  # the number of algorithms used in this experiment
+
+for sp in ${sparsity_values[@]};
+do
+	for p in ${ps[@]}
 	do
-		./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-		# ./naive_mm_test 	$n $n $n $sp $trials $warmups $sparsity_pattern naive $FILE
-		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
-		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
+
+		./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko_p=$p $FILE
+		
 	done
 done
+
 # exit 0 # exit without errors
 
-# ### PLOTS PART ####
+### PLOTS PART ####
 
 PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
@@ -130,7 +125,8 @@ nameHype=$unscr$hyperthreading$unscr$person
 cp $FILE $path$time$unscr$FILE$unscr$sparsity_pattern$nameHype
 
 # Call the python plot script with inputs
-python3 plots_comp_varyN.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype $n_start $n_end $n_step
+python3 plots_comp.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype
+
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"
