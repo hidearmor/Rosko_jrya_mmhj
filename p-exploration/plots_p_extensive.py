@@ -51,7 +51,8 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
 
     # Determine min and max runtime values to later fix the Z-axis for all subplots
     sparsity = round(float(sparsity), 1)
-    filter = (dft['algo'] == 'rosko') & (round(dft['sp'],1) == sparsity)
+    ps_max = max(int(p) for p in ps)
+    filter = (dft['algo'] == 'rosko') & (round(dft['sp'],1) == sparsity) & (dft['p'] <= ps_max)
     min_runtime = dft[filter]['rosko-time'].min()
     max_runtime = dft[filter]['rosko-time'].max()
 
@@ -67,7 +68,7 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
     
 
     for i_spp in range(len(sparsity_patterns)):
-        constants_filter = (dft['algo'] == 'rosko') & (round(dft['sp'], 1) == sparsity) & (dft['sppattern'] == sparsity_patterns[i_spp])
+        constants_filter = filter & (dft['sppattern'] == sparsity_patterns[i_spp])
         rosko_ps = dft[constants_filter]['p']
         rosko_ns = dft[constants_filter]['N']
         rosko_times = dft[constants_filter][time_type]
@@ -140,7 +141,8 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         nrows, ncols = num_sppatterns, 1
 
     # Determine min and max runtime values to later fix the Z-axis for all subplots
-    filter = (dft['algo'] == 'rosko') & (dft['N'] == n)
+    sparsities_min = round(float(min(sparsities)), 1)
+    filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & (round(dft['sp'], 1) >= sparsities_min)
     min_runtime = dft[filter]['rosko-time'].min()
     max_runtime = dft[filter]['rosko-time'].max()
 
@@ -156,7 +158,7 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
     
 
     for i_spp in range(len(sparsity_patterns)):
-        constants_filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & (dft['sppattern'] == sparsity_patterns[i_spp])
+        constants_filter = filter & (dft['sppattern'] == sparsity_patterns[i_spp])
         rosko_ps = dft[constants_filter]['p']
         rosko_sps = dft[constants_filter]['sp']
         rosko_times = dft[constants_filter][time_type]
