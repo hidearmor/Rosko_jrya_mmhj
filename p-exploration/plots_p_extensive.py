@@ -186,7 +186,7 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         ax.set_xlabel("Threads (p)")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("Sparsity (sp)")
-        ax.set_yticks(np.asarray(sparsities, dtype=float))
+        # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.set_zlabel("Runtime (sec)")
         ax.set_zlim(min_runtime, max_runtime)
 

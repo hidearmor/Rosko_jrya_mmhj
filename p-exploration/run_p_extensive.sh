@@ -47,7 +47,8 @@ if [ "$person" == "mmhj" ]; then
 	declare -i warmups=5
 	n_start=512
 	# n_end=2048
-	n_end=4096
+	# n_end=4096
+	n_end=2560
 	# n_end=1024
 	# n_end=10240
 	n_step=512
