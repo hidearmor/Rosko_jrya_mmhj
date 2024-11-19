@@ -2,6 +2,7 @@ import pandas
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import matplotlib.cm as cm
+import matplotlib as mpl
 import numpy as np
 import datetime
 import os
@@ -10,7 +11,9 @@ import sys
 from pathlib import Path
 from matplotlib import ticker as mticker
 from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D 
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.interpolate import griddata
+
 
 
 # GLOBAL VARIABLES
@@ -26,9 +29,8 @@ DEBUG = True
 #set env path to root directory ?? for python liibrary function to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
-	
 
-def plot_3D(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details, fname = "plot_p_3D", time_type="rosko-time"):
+def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, results_fname, env_details, fname = "plot_p_3D_constant_sparsity", time_type="rosko-time"):
     plt.rcParams.update({'font.size': 12})
     markers = ['o', 'v', 's', 'd', '^', 'p', '*', 'h', 'x', '+']
     colors = ['b', 'g', 'k', 'r', 'c', 'm', 'y', 'orange', 'purple', 'brown']
@@ -38,6 +40,11 @@ def plot_3D(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_det
     file_path = Path('./' + results_fname)
     creation_datetime = datetime.datetime.fromtimestamp(file_path.stat().st_ctime)
     plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
+
+    if DEBUG:
+         print(creation_datetime)
+         print(plotsDir)
+         print(dateStr)
 
     # Determine subplot grid layout based on number of patterns
     num_sppatterns = len(sparsity_patterns)
@@ -49,9 +56,112 @@ def plot_3D(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_det
     else:
         nrows, ncols = 1, num_sppatterns
 
-    # fig, axes = plt.subplots(nrows, ncols, figsize=(5 * len(sparsity_patterns), 5), subplot_kw={'projection': '3d'})
-    # fig, axes = plt.subplots(nrows, ncols, figsize=(5 * nrows, 5 * ncols), subplot_kw={'projection': '3d'})
+    # Determine min and max runtime values to later fix the Z-axis for all subplots
+    sparsity = float(sparsity)
+    filter = (dft['algo'] == 'rosko') & (dft['sp'] == sparsity)
+    min_runtime = dft[filter]['rosko-time'].min()
+    max_runtime = dft[filter]['rosko-time'].max()
+
+    # Create subplots
+    fig, axes = plt.subplots(
+        nrows, ncols,
+        figsize=(7 * ncols + 5, 7 * nrows),  # Increase figure size for more room
+        layout = 'constrained', 
+        subplot_kw={'projection': '3d'}
+    )
+ 
+    axes = np.array(axes).flatten()  # Flatten in case of a 2D grid for easier indexing
     
+
+    for i_spp in range(len(sparsity_patterns)):
+        constants_filter = (dft['algo'] == 'rosko') & (dft['sp'] == sparsity) & (dft['sppattern'] == sparsity_patterns[i_spp])
+        rosko_ps = dft[constants_filter]['p'].values
+        rosko_ns = dft[constants_filter]['N'].values
+        rosko_times = dft[constants_filter][time_type].values
+
+        x1 = np.linspace(dft[constants_filter]['p'].min(), dft[constants_filter]['p'].max(), len(dft[constants_filter]['p'].unique()))
+        y1 = np.linspace(dft[constants_filter]['N'].min(), dft[constants_filter]['N'].max(), len(dft[constants_filter]['N'].unique()))
+        x2, y2 = np.meshgrid(x1, y1)
+        z2 = griddata((dft[constants_filter]['p'], dft[constants_filter]['N']), dft[constants_filter][time_type], (x2, y2), method='cubic')
+
+        # Plot the surface
+        ax = axes[i_spp]
+        # surf = ax.plot_trisurf(rosko_ps, rosko_ns, rosko_times, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        # surf = ax.plot_surface(rosko_ps, rosko_ns, rosko_times, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.7)
+        surf = ax.scatter3D(rosko_ps, rosko_ns, rosko_times, alpha = 0.8, c=(rosko_times), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+
+        # Add subplot-specific title and labels
+        title = titles[i_spp]
+        official_title = title[0].title() + title[1 :]
+        ax.set_title(f"{official_title}", fontsize=14, pad=2)
+        ax.set_xlabel("Threads (p)")
+        ax.set_ylabel("N")
+        ax.set_zlabel("Runtime (sec)")
+        ax.set_zlim(min_runtime, max_runtime)
+
+        if DEBUG:
+            #   print(dft.dtypes)
+              print(rosko_ps)
+              print(rosko_ns)
+              print(rosko_times)
+
+
+    # Add a single, shared color bar on the right side of all plots
+    # fig.subplots_adjust(right=0.85)  # Adjust main plot area to make room for color bar
+    # cbar_ax = fig.add_axes([0.95, 0.15, 0.02, 0.7])  # Position color bar to the right
+    # cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    # fig.colorbar(surf, cax=cbar_ax, orientation='vertical', label="Runtime (sec)")
+    # fig.colorbar(surf, ax=axes.ravel().tolist(), orientation='vertical', label="Runtime (sec)")
+    # cbar = fig.colorbar(surf)
+    # cbar.set_label(label="Runtime (sec)")
+
+    # cax,kw = mpl.colorbar.make_axes([ax for ax in axes])
+    # plt.colorbar(surf, cax=cax, **kw)
+
+    fig.colorbar(surf, ax=axes[:], location='right', shrink=0.3)
+
+    official_suptitle = "3D Runtime Surface Plots for Different Sparsity Patterns for " + str(sparsity) + "% sparsity"
+    fig.suptitle(official_suptitle, fontsize=16)
+    fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+    fig.align_titles()
+    # plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    if DEBUG:
+         print("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details))
+    fig.savefig("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight', pad_inches=0.8)
+    plt.show()
+    plt.clf()
+    plt.close('all')
+
+
+
+def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details, fname = "plot_p_3D_constant_N", time_type="rosko-time"):
+    plt.rcParams.update({'font.size': 12})
+    markers = ['o', 'v', 's', 'd', '^', 'p', '*', 'h', 'x', '+']
+    colors = ['b', 'g', 'k', 'r', 'c', 'm', 'y', 'orange', 'purple', 'brown']
+    dft = pandas.read_csv(results_fname)
+
+    # create results folders if not there and put plots in them, and get time
+    file_path = Path('./' + results_fname)
+    creation_datetime = datetime.datetime.fromtimestamp(file_path.stat().st_ctime)
+    plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
+
+    if DEBUG:
+         print(creation_datetime)
+         print(plotsDir)
+         print(dateStr)
+
+    # Determine subplot grid layout based on number of patterns
+    num_sppatterns = len(sparsity_patterns)
+
+    if num_sppatterns == 2:
+        nrows, ncols = 1, 2
+    elif num_sppatterns == 4:
+        nrows, ncols = 2, 2
+    else:
+        nrows, ncols = 1, num_sppatterns
+
     # Determine min and max runtime values to later fix the Z-axis for all subplots
     filter = (dft['algo'] == 'rosko') & (dft['N'] == n)
     min_runtime = dft[filter]['rosko-time'].min()
@@ -59,18 +169,14 @@ def plot_3D(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_det
 
     # Create subplots
     fig, axes = plt.subplots(
-        nrows, ncols, 
-        figsize=(5 * ncols, 5 * nrows),  # Increase figure size for more room
+        nrows, ncols,
+        figsize=(7 * ncols + 5, 7 * nrows),  # Increase figure size for more room
+        layout = 'constrained', 
         subplot_kw={'projection': '3d'}
     )
-
-    # Add spacing between subplots
-    # fig.subplots_adjust(
-    #     wspace=0.4,  # Add horizontal space between subplots
-    #     hspace=2.0   # Add vertical space between rows
-    # )
-
+ 
     axes = np.array(axes).flatten()  # Flatten in case of a 2D grid for easier indexing
+    
 
     for i_spp in range(len(sparsity_patterns)):
         constants_filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & (dft['sppattern'] == sparsity_patterns[i_spp])
@@ -78,46 +184,58 @@ def plot_3D(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_det
         rosko_sps = dft[constants_filter]['sp'].values
         rosko_times = dft[constants_filter][time_type].values
 
-        # Plot the surface
-        ax = axes[i_spp]
-        surf = ax.plot_trisurf(rosko_ps, rosko_sps, rosko_times, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
-
-        # Add subplot-specific title and labels
-        ax.set_title(f"{titles[i_spp]}", fontsize=14, pad=10)
-        ax.set_xlabel("Threads (p)")
-        ax.set_ylabel("Sparsity (sp)")
-        ax.set_zlabel("Runtime (sec)")
-        ax.set_zlim(min_runtime, max_runtime)
-        # Add a color bar
-        # fig.colorbar(surf, ax=ax, shrink=0.3, aspect=10, fraction=0.05, pad=0.2)
-        # fig.colorbar(surf, ax=axes[i_spp], shrink=0.5, aspect=10)
-
         if DEBUG:
             #   print(dft.dtypes)
               print(rosko_ps)
               print(rosko_sps)
               print(rosko_times)
 
-        # algo_time = dft[(dft['algo'] == algos[j]) & (round(dft['sp'], 1) == float(sparsities[i]))]['time'].values
+        x1 = np.linspace(dft[constants_filter]['p'].min(), dft[constants_filter]['p'].max(), len(dft[constants_filter]['p'].unique()))
+        y1 = np.linspace(dft[constants_filter]['sp'].min(), dft[constants_filter]['sp'].max(), len(dft[constants_filter]['sp'].unique()))
+        x2, y2 = np.meshgrid(x1, y1)
+        z2 = griddata((dft[constants_filter]['p'], dft[constants_filter]['sp']), dft[constants_filter][time_type], (x2, y2), method='cubic')
+
+        # Plot the surface
+        ax = axes[i_spp]
+        # surf = ax.plot_trisurf(rosko_ps, rosko_sps, rosko_times, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        # surf = ax.plot_surface(rosko_ps, rosko_sps, rosko_times, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.7)
+        surf = ax.scatter3D(rosko_ps, rosko_sps, rosko_times, alpha = 0.8, c=(rosko_times), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+
+        # Add subplot-specific title and labels
+        title = titles[i_spp]
+        official_title = title[0].title() + title[1 :]
+        ax.set_title(f"{official_title}", fontsize=14, pad=2)
+        ax.set_xlabel("Threads (p)")
+        ax.set_ylabel("Sparsity (sp)")
+        ax.set_zlabel("Runtime (sec)")
+        ax.set_zlim(min_runtime, max_runtime)
+
+
 
     # Add a single, shared color bar on the right side of all plots
-    fig.subplots_adjust(right=0.85)  # Adjust main plot area to make room for color bar
-    cbar_ax = fig.add_axes([0.95, 0.15, 0.02, 0.7])  # Position color bar to the right
-    fig.colorbar(surf, cax=cbar_ax, orientation='vertical', label="Runtime (sec)")
-    # plt.title('SpMM runtime at various N,\nusing ' + title, fontsize = 18 )
-    plt.suptitle("3D Runtime Surface Plots for Different Sparsity Patterns", fontsize=16)
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
-    # plt.xlabel("N", fontsize = 16)
-    # plt.ylabel("Runtime (sec)", fontsize = 16)
-    # plt.yticks( fontsize = 10)
-    # plt.xticks( fontsize = 10)
-    # num_ticks = len(sparsities) # Number of x-ticks you want
-    # plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
-    # plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
-    # plt.legend(loc = "upper left", prop={'size': 14})
-    # plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
-    # plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
-    plt.savefig("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight')
+    # fig.subplots_adjust(right=0.85)  # Adjust main plot area to make room for color bar
+    # cbar_ax = fig.add_axes([0.95, 0.15, 0.02, 0.7])  # Position color bar to the right
+    # cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    # fig.colorbar(surf, cax=cbar_ax, orientation='vertical', label="Runtime (sec)")
+    # fig.colorbar(surf, ax=axes.ravel().tolist(), orientation='vertical', label="Runtime (sec)")
+    # cbar = fig.colorbar(surf)
+    # cbar.set_label(label="Runtime (sec)")
+
+    # cax,kw = mpl.colorbar.make_axes([ax for ax in axes])
+    # plt.colorbar(surf, cax=cax, **kw)
+
+    fig.colorbar(surf, ax=axes[:], location='right', shrink=0.3)
+
+    official_suptitle = "3D Runtime Surface Plots for Different Sparsity Patterns for N=" + str(n)
+    fig.suptitle(official_suptitle, fontsize=16)
+    fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+    fig.align_titles()
+    # plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    if DEBUG:
+         print("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details))
+    fig.savefig("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight', pad_inches=0.8)
     plt.show()
     plt.clf()
     plt.close('all')
@@ -199,13 +317,13 @@ def main():
     for sppattern in sparsity_patterns:
         titles.append(makeTitle(sppattern))
 
+    sparsity = sparsities[len(sparsities)-1] # Use the largest sparsity as constant for 3D plot
 
     if DEBUG:
-        print(sparsity_patterns, sparsities, ps, ns)
+        print("Some of the inputs to plot_3D_constant_sparsity:")
+        print(sparsity_patterns, sparsity, ps, ns)
 
-
-    # Create the 4D plot
-    # plot_4D(sparsity_patterns, sparsities, ps, ns, titles, results_fname, env_details)
+    plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, results_fname, env_details)
 	
 	# Create 3D plot
     n = ns[len(ns)-1] # Use the largest n as constant for 3D plot
@@ -213,7 +331,7 @@ def main():
     if DEBUG:
         print(sparsity_patterns, sparsities, ps, n)    
 
-    plot_3D(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details)
+    plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details)
     
     
 
