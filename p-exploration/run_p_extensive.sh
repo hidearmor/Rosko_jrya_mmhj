@@ -74,11 +74,11 @@ elif [ "$person" == "jrya" ]; then
 	n_end=8192
 	# n_end=10240
 	n_step=512
-	ps=(1 2 3 4 5 6 10 14 20 40 50 75 100 125 150 175 200 225 250 275 300 350 600 1000 10000)
+	ps=(1 2 3 4 5 6 10 14 20 40 43 46 50 75 100 125 150 175 200)
 	# ps=(225 230 235 240 245 250 255 260 265 270)
 	# ps=(100000)
 	num_ps=${#ps[@]}
-	sparsity_values=(20 30 40 50 60 70 80 85 90 95 97 98 99)
+	sparsity_values=(20 30 40 50 60 70 80 85 90 95 97 98 99 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 	measure="mm" # options: all, packing, mm
 

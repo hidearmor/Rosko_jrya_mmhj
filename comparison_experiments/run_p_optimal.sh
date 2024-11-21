@@ -67,7 +67,8 @@ elif [ "$person" == "jrya" ]; then
 	declare -i warmups=10
 	# declare -i n=6144
 	declare -i n=8192
-	ps=(6 40)
+	declare -i n=200
+	ps=(6 10 20 40 43 46 50)
 	num_ps=${#ps[@]}
 
 else
