@@ -104,12 +104,12 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
         official_title = title[0].title() + title[1 :]
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
         ax.set_xlabel("p")
+        ax.set_xlim(ps_min, ps_max)
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("N")
         ax.set_yticks(np.asarray(ns, dtype=int))
         ax.set_zlabel("Runtime (sec)")
         ax.set_zlim(min_runtime, max_runtime)
-
 
 
     # Add a single, shared color bar on the right side of all plots
@@ -201,12 +201,15 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         title = titles[i_spp]
         official_title = title[0].title() + title[1 :]
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
-        ax.invert_yaxis()
-        ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.set_xlabel("p")
+        ax.set_xlim(ps_min, ps_max)
+        # ax.set_xticks(np.arange(ps_min, ps_max+1, 20.0))
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("Sparsity (sp)")
-        # # ax.set_yticks(np.asarray(sparsities, dtype=float))
+        ax.set_yticks(np.arange(sparsities_min, sparsities_max+1, 10.0))
+        # ax.set_yticks(np.asarray(sparsities, dtype=float))
+        ax.invert_yaxis()
+        # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.set_zlabel("Runtime (sec)")
         ax.set_zlim(min_runtime, max_runtime)
 
@@ -218,8 +221,8 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
     # Add the title for the whole figure
     official_suptitle = "3D Runtime Surface Plots for Rosko, for Different Sparsity Patterns and N=" + str(n)
     fig.suptitle(official_suptitle, fontsize=16)
-    fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
-    fig.align_titles()
+    # fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+    # fig.align_titles()
 
     # Save the figure
     fig.savefig("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight', pad_inches=0.8)
@@ -245,6 +248,13 @@ def makeTitle(sparsity_pattern):
 		sys.exit()
 
 	return title
+
+def closest(lst, val):
+     
+    # return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-val))]
+    lst = np.array(lst, dtype=float)
+    idx = (np.abs(lst - val)).argmin()
+    return lst[idx]
 
 
 def main():
@@ -306,7 +316,7 @@ def main():
 
     # CREATE 3D PLOTS
 
-    sparsity = sparsities[len(sparsities)-1] # Use the largest sparsity as constant for 3D plot
+    sparsity = closest(sparsities, 90.0) # Choose the value in sparsities that is cloest to 90% sparsity as constant for 3D plot
 
     if DEBUG:
         print("Some of the inputs to plot_3D_constant_sparsity:")
