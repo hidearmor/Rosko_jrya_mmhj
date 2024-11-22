@@ -98,6 +98,8 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
         # surf = ax.plot_trisurf(rosko_ps.values, rosko_ns.values, rosko_times.values, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
         surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.5)
         surf = ax.scatter3D(rosko_ps.values, rosko_ns.values, rosko_times.values, alpha = 0.9, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        ax.plot(rosko_ps.values, rosko_ns.values, 'k.', zdir='z', zs=min_runtime, alpha=0.2)
+        ax.contourf(x2, y2, z2,zdir='z', offset=min_runtime, cmap=cm.jet_r, alpha=0.2,  vmin=min_runtime, vmax=max_runtime)
 
         # Add subplot-specific title and labels
         title = titles[i_spp]
@@ -105,11 +107,13 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
         ax.set_xlabel("p")
         ax.set_xlim(ps_min, ps_max)
+        # ax.tick_params(axis='x', labelrotation = 50)
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("N")
         ax.set_yticks(np.asarray(ns, dtype=int))
         ax.set_zlabel("Runtime (sec)")
         ax.set_zlim(min_runtime, max_runtime)
+        ax.view_init(18,-32)
 
 
     # Add a single, shared color bar on the right side of all plots
@@ -118,7 +122,7 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
     # Add the title for the whole figure
     official_suptitle = "3D Runtime Surface Plots for Rosko, for Different Sparsity Patterns and " + str(sparsity) + "% sparsity"
     fig.suptitle(official_suptitle, fontsize=16)
-    fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+    # fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
     # fig.align_titles()
 
     # Save the figure
@@ -188,16 +192,17 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         x1 = np.linspace(rosko_ps.min(), rosko_ps.max(), len(rosko_ps.unique()))
         y1 = np.linspace(rosko_sps.min(), rosko_sps.max(), len(rosko_sps.unique()))
         x2, y2 = np.meshgrid(x1, y1)
-        z2 = griddata((rosko_ps, rosko_sps), dft[constants_filter][time_type], (x2, y2), method='cubic')
+        z2 = griddata((rosko_ps, rosko_sps), rosko_times, (x2, y2), method='cubic')
         
         # Plot the surface plot with the datapoints in (surface + scatter)
         ax = axes[i_spp]
         # surf = ax.plot_trisurf(rosko_ps.values, rosko_sps.values, rosko_times.values, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
         surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.5)
         surf = ax.scatter3D(rosko_ps.values, rosko_sps.values, rosko_times.values, alpha = 0.9, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        ax.plot(rosko_ps.values, rosko_sps.values, 'k.', zdir='z', zs=min_runtime, alpha=0.2)
+        ax.contourf(x2, y2, z2,zdir='z', offset=min_runtime, cmap=cm.jet_r, alpha=0.2,  vmin=min_runtime, vmax=max_runtime)
 
-
-        # Add subplot-specific title and labels
+        # Add subplot-specific title and labels and more
         title = titles[i_spp]
         official_title = title[0].title() + title[1 :]
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
@@ -212,7 +217,8 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.set_zlabel("Runtime (sec)")
         ax.set_zlim(min_runtime, max_runtime)
-
+        ax.view_init(18,-32)
+        
 
 
     # Add a single, shared color bar on the right side of all plots
