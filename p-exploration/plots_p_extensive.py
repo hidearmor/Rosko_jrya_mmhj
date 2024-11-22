@@ -51,8 +51,16 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
 
     # Determine min and max runtime values to later fix the Z-axis for all subplots
     sparsity = round(float(sparsity), 1)
+    ns_min = min(int(n) for n in ns)
+    ns_max = max(int(n) for n in ns)
+    ps_min = min(int(p) for p in ps)
     ps_max = max(int(p) for p in ps)
-    filter = (dft['algo'] == 'rosko') & (round(dft['sp'],1) == sparsity) & (dft['p'] <= ps_max)
+    filter = (dft['algo'] == 'rosko') & \
+             (round(dft['sp'],1) == sparsity) & \
+             (dft['N'] >= ns_min) & \
+             (dft['N'] <= ns_max) & \
+             (dft['p'] >= ps_min) & \
+             (dft['p'] <= ps_max)
     min_runtime = dft[filter]['rosko-time'].min()
     max_runtime = dft[filter]['rosko-time'].max()
 
@@ -88,14 +96,14 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
         # Plot the surface plot with the datapoints in (surface + scatter)
         ax = axes[i_spp]
         # surf = ax.plot_trisurf(rosko_ps.values, rosko_ns.values, rosko_times.values, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
-        surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.7)
-        surf = ax.scatter3D(rosko_ps.values, rosko_ns.values, rosko_times.values, alpha = 1.0, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.5)
+        surf = ax.scatter3D(rosko_ps.values, rosko_ns.values, rosko_times.values, alpha = 0.9, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
 
         # Add subplot-specific title and labels
         title = titles[i_spp]
         official_title = title[0].title() + title[1 :]
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
-        ax.set_xlabel("Threads (p)")
+        ax.set_xlabel("p")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("N")
         ax.set_yticks(np.asarray(ns, dtype=int))
@@ -142,7 +150,14 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
 
     # Determine min and max runtime values to later fix the Z-axis for all subplots
     sparsities_min = round(float(min(sparsities)), 1)
-    filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & (round(dft['sp'], 1) >= sparsities_min)
+    sparsities_max = round(float(max(sparsities)), 1)
+    ps_min = min(int(p) for p in ps)
+    ps_max = max(int(p) for p in ps)
+    filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & \
+             (round(dft['sp'], 1) >= sparsities_min) & \
+             (round(dft['sp'], 1) <= sparsities_max) & \
+             (dft['p'] >= ps_min) & \
+             (dft['p'] <= ps_max)
     min_runtime = dft[filter]['rosko-time'].min()
     max_runtime = dft[filter]['rosko-time'].max()
 
@@ -170,25 +185,28 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
             print(rosko_times)
 
         # Grid formatting specifically for plot_surface arguments
-        x1 = np.linspace(dft[constants_filter]['p'].min(), dft[constants_filter]['p'].max(), len(dft[constants_filter]['p'].unique()))
-        y1 = np.linspace(dft[constants_filter]['sp'].min(), dft[constants_filter]['sp'].max(), len(dft[constants_filter]['sp'].unique()))
+        x1 = np.linspace(rosko_ps.min(), rosko_ps.max(), len(rosko_ps.unique()))
+        y1 = np.linspace(rosko_sps.min(), rosko_sps.max(), len(rosko_sps.unique()))
         x2, y2 = np.meshgrid(x1, y1)
-        z2 = griddata((dft[constants_filter]['p'], dft[constants_filter]['sp']), dft[constants_filter][time_type], (x2, y2), method='cubic')
-
+        z2 = griddata((rosko_ps, rosko_sps), dft[constants_filter][time_type], (x2, y2), method='cubic')
+        
         # Plot the surface plot with the datapoints in (surface + scatter)
         ax = axes[i_spp]
         # surf = ax.plot_trisurf(rosko_ps.values, rosko_sps.values, rosko_times.values, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
-        surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.7)
-        surf = ax.scatter3D(rosko_ps.values, rosko_sps.values, rosko_times.values, alpha = 1.0, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.5)
+        surf = ax.scatter3D(rosko_ps.values, rosko_sps.values, rosko_times.values, alpha = 0.9, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+
 
         # Add subplot-specific title and labels
         title = titles[i_spp]
         official_title = title[0].title() + title[1 :]
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
-        ax.set_xlabel("Threads (p)")
+        ax.invert_yaxis()
+        ax.set_yticks(np.asarray(sparsities, dtype=float))
+        ax.set_xlabel("p")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("Sparsity (sp)")
-        # ax.set_yticks(np.asarray(sparsities, dtype=float))
+        # # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.set_zlabel("Runtime (sec)")
         ax.set_zlim(min_runtime, max_runtime)
 
