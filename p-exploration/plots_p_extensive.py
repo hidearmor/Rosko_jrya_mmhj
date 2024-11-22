@@ -119,7 +119,7 @@ def plot_3D_constant_sparsity(sparsity_patterns, sparsity, ps, ns, titles, resul
     official_suptitle = "3D Runtime Surface Plots for Rosko, for Different Sparsity Patterns and " + str(sparsity) + "% sparsity"
     fig.suptitle(official_suptitle, fontsize=16)
     fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
-    fig.align_titles()
+    # fig.align_titles()
 
     # Save the figure
     fig.savefig("%s%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight', pad_inches=0.8)
