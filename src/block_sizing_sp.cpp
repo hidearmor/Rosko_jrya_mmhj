@@ -54,11 +54,13 @@ cache_dims_t* get_sparse_cache_dims(int M, int N, int K, int p,
 		
 		double k_f; // fraction of row vecs of B that must be loaded for mrxkcxnr outer product
 		int kc_ret;
-		float size_fact = 2.5; // total pack size expressed as factor of only A_sp (e.g., 2.5 times nnz vals)
+
+		// total pack size expressed as factor of only A_sp (e.g., 2.5 times nnz vals)
+		float size_fact = 2.5; // Jonas can this be a culprit?
 		float alpha, a_q, b_q, c_q, d = density; 
 		// double a_coeff = (d/mr) * ((int) ceil(d * mr)) ;
 		double a_coeff = size_fact*d;
-		cake_cntx->alpha_n = 1.0;
+		cake_cntx->alpha_n = 1.0; // jonas here they overrule
 		alpha = cake_cntx->alpha_n;
 		// 3*d*mr*kc + nr*k_f*kc + mr*nr <= L2 (roughly 3*4 = 12 bytes for each float nnz val due to metadata)
 		// k_f = clamp_val(density * mr, 0, 1);
@@ -82,8 +84,11 @@ cache_dims_t* get_sparse_cache_dims(int M, int N, int K, int p,
 		// printf("sparsity-aware tiling\n");
 
 		if(alg == 0) {
-
-			// 
+			// Jonas
+			// can it be so, that the higher fidelity from higher p-value yields
+			// more precise results and less rounding ?
+			// can it be type size that is not correct ? (reg size someting? byte)
+			// How about extra padding ?
 			mc_L2 = (int)  ((-b + sqrt(b*b + 4*a_coeff*(((double) cake_cntx->L2) / (type_size)))) / (2.0*a_coeff)) ;
 			mc_L2 -= (mc_L2 % mr);
 
@@ -133,6 +138,7 @@ cache_dims_t* get_sparse_cache_dims(int M, int N, int K, int p,
 
 
 		// If nc is going to be larger than N, set nc to N and re-compute mc
+		// Jonas can this be relevant ??
 		if((p*mc_L3) > N) {
 
 			nc_ret = N;
@@ -168,6 +174,7 @@ cache_dims_t* get_sparse_cache_dims(int M, int N, int K, int p,
 			}
 
 			mc_ret = mc_L3;
+			// Jonas her
 			if(M < p*mr) {
 				mc_ret = mr;
 			} else if(M < p*mc_ret) {
@@ -218,6 +225,7 @@ cache_dims_t* get_sparse_cache_dims(int M, int N, int K, int p,
 		blk_ret->n_c = nc_ret;
 	} 
 
+	// Jonas printing here!
 	// printf("yo %d %d %d %d\n", blk_ret->m_c, blk_ret->k_c, blk_ret->n_c, alg);
 	return blk_ret;
 }
@@ -243,6 +251,7 @@ void init_sparse_block_dims(int M, int N, int K, int p,
 
 		case KMN: {
 
+			// Jonas padding here (pad is a boolean)
 			x->k_pad = (K % x->k_c) ? 1 : 0; 
 			x->n_pad = (N % x->n_c) ? 1 : 0; 
 			x->m_pad = (M % (p*x->m_c)) ? 1 : 0; 
