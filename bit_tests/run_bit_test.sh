@@ -10,21 +10,6 @@ cd $x;
 echo $ROSKO_HOME;
 echo $CAKE_HOME;
 
-# export GOMP_CPU_AFFINITY="0 1 2 3 4 5 6 7 8 9";
-
-# x=$PWD
-# sudo cp mkl_sparse_gemm.cpp /opt/intel/oneapi/mkl/2021.1.1/examples/sycl/spblas
-# cd /opt/intel/oneapi/mkl/2021.1.1/examples/sycl
-# make sointel64 examples="spblas/mkl_sparse_gemm" sycl_devices=cpu
-# cp _results/intel64_so_tbb/spblas/mkl_sparse_gemm.out $x
-# cd $x
-
-
-
-# make;
-
-# filename="results" #Mayas imp
-
 # check if results exists and if it does, move it
 FILE="results_numpy"
 # FILE="results_comp_numpy"
@@ -41,10 +26,6 @@ fi
 echo "algo,p,sp,M,K,N,sppattern,time,ntrials, bits" >> $FILE
 
 # Experiment parameters setup
-# declare -i trials=2
-# declare -i warmups=1
-# declare -i n=256
-# declare -i cores=4
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 person=$1 # argument for who is doing dis
 declare -i trials=30
@@ -55,21 +36,13 @@ algorithms=("rosko" "numpy_csr")  # options: rosko, naive, numpy_csr, numpy_arr,
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
 sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
-# sparsity_values=(99 99.5 99.8 99.9)
-# sparsity_values=(60 70 80)
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 
 for sp in ${sparsity_values[@]};
 do
-	# ./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	python3 numscipy_mm_test_32.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE 32
 	python3 numscipy_mm_test_64.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE 64
-
-	# ./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-	# python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
-	# python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
-
 done
 
 # exit 0 # exit without errors
