@@ -12,12 +12,7 @@ from matplotlib import ticker as mticker
 
 # GLOBAL VARIABLES
 # FYI: currently markers and colors only allow for 5 algorithms in one plot, each with a distinctive marker and color
-ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko', 
-                             'numpy_arr':'Array-Numpy', 
-                             'numpy_csr':'CSR-Numpy', 
-                             'naive':'Naive', 
-                             'numpy_dense':'Array-Numpy, zeros stripped', 
-                             'numpy_dia':'Diagonal-Numpy'}
+ALLOWED_ALGOS_WITH_LABEL =  {'numpy_csr':'CSR-Numpy'}
 ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 
                              'row-pattern', 
                              'diagonal', 
@@ -30,7 +25,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 	
 
-def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname, env_details, fname = "plot_comp"):
+def plot_comparison(algos, sparsities, sparsity_pattern, title, results_fname, env_details, bits, fname = "plot_bits"):
 	plt.rcParams.update({'font.size': 12})
 	markers = ['o','v','s','d','^']
 	colors = ['b','g','k','r','r']
@@ -44,24 +39,20 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	
 	
 	plt.figure(figsize = (6,4))
-	for i in range(len(algos)):
-		algo_time = dft[dft['algo'] == algos[i]]['time'].values
-		algo_sparsities = dft[dft['algo'] == algos[i]]['sp'].values
-		plt.plot(algo_sparsities, algo_time, label = labels[i], marker = markers[i], color = colors[i])
+	for i in range(len(bits)):
+		print('hehe')
+		algo_time = dft[dft['bits'] == bits[i]]['time'].values
+		algo_sparsities = dft[dft['bits'] == bits[i]]['sp'].values
+		plt.plot(algo_sparsities, algo_time / (100-algo_sparsities), label = str(bits[i]) + ' bits', marker = markers[i], color = colors[i])
 		
 	
-	# plt.ticklabel_format(useOffset=False, style='plain')
-	plt.title('SpMM runtime at various sparsities on Intel i5,\nusing ' + title, fontsize = 24)
-	plt.xlabel("Sparsity (%)", fontsize = 24)
-	plt.ylabel("Runtime (sec)", fontsize = 24)
-	# plt.yticks( fontsize = 10)
-	# num_ticks = len(sparsities) # Number of x-ticks you want
-	# plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
+	plt.title('Numpy dense 32 VS 64 bit floating point values', fontsize = 24)
+	plt.xlabel("Sparsity (%)", fontsize = 16)
+	plt.ylabel("Running time / density", fontsize = 16)
 	plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
-	plt.legend(loc = "upper right", prop={'size': 14})
-	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
-	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
-	plt.savefig("%s%s_%s_%s_perf%s.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
+	plt.yticks( fontsize = 10)
+	plt.legend(loc = "center right", prop={'size': 12})
+	plt.savefig("%s%s_%s_%s.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight')
 	plt.show()
 	plt.clf()
 	plt.close('all')
@@ -87,16 +78,6 @@ def makeTitle(sparsity_pattern):
 	return title
 
 
-def makeLabels(algos):
-    
-    labels = []
-    
-    for algo in algos:
-        labels.append(ALLOWED_ALGOS_WITH_LABEL[algo])
-    
-    return labels
-
-
 def main():
     
 	if DEBUG: print(sys.argv)
@@ -118,6 +99,8 @@ def main():
 			sys.exit()
 		algos.append(algo)
 
+	bits = [32, 64]
+
 	# Read the sparsity values used in experiment and write them in sparsities array
 	num_sparsities = int(sys.argv[3+num_algos])
 	sparsities = []
@@ -134,14 +117,12 @@ def main():
 	# Define part of the plot-title depending on the sparsity pattern
 	title = makeTitle(sparsity_pattern)
 
-	# Define the labels array based on the algorithms used in experiment
-	labels = makeLabels(algos)
  
 	if DEBUG:
-		print(sparsity_pattern, algos, sparsities, labels)
+		print(sparsity_pattern, algos, sparsities)
   
 	# Create the plot
-	plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_fname, env_details)
+	plot_comparison(algos, sparsities, sparsity_pattern, title, results_fname, env_details, bits)
     
     
 
