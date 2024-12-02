@@ -109,13 +109,6 @@ def generateMatricesAB(M, N, K, sp, algo, sp_pattern):
             # make a sparse row pattern MxK matrix
             pass
             
-    
-    # DOES NOT WORK - dimensions af matrices in MM don't align    
-    # elif sp_pattern == 'column-pattern':
-    #     K_nz_cols = round(d * K)
-    #     sp = 1.0 - (K_nz_cols / K)
-    #     matrix_A = np.random.rand(M, K_nz_cols)
-        
     elif sp_pattern == 'random-uniform':
         matrix_A = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr', dtype=np.float32)
         if algo == 'numpy_arr':
