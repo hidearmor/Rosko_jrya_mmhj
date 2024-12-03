@@ -46,7 +46,7 @@ def plot_comparison(algos, sparsities, sparsity_pattern, title, results_fname, e
 		plt.plot(algo_sparsities, algo_time / (100-algo_sparsities), label = str(bits[i]) + ' bits', marker = markers[i], color = colors[i])
 		
 	
-	plt.title('Numpy dense 32 VS 64 bit floating point values', fontsize = 24)
+	plt.title('Numpy dense 32 VS 64 bit floats', fontsize = 24)
 	plt.xlabel("Sparsity (%)", fontsize = 16)
 	plt.ylabel("Running time / density", fontsize = 16)
 	plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
