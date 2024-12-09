@@ -397,7 +397,7 @@ void correctnessSuite(int maxDimSize, float sp_init, std::string sp_pattern, int
 
     for (const auto& [M, N, K] : shapes) {
         printf("shape: M %d, K %d, N %d\n", M, K, N);
-        if ((sp_init >= 100.0f && sp_pattern == "diagonal")
+        if ((sp_init >= 100.0f)
             || (sp_init > 99.5f && (sp_pattern == "column-pattern" || sp_pattern == "row-pattern")))
             {
                 // printf("\nsparsity too high for pattern continuing, pattern %s, sp %f", sp_pattern.c_str(), sp_init);
