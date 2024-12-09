@@ -39,10 +39,10 @@ if [ "$person" == "mmhj" ]; then
 
     echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
     
-	declare -i trials=30
+	declare -i trials=15
 	declare -i warmups=10
 	n=2560
-	ps=(4 5 6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 400 1000)
+	ps=(4 5 6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	num_ps=${#ps[@]}
 	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
@@ -52,10 +52,10 @@ elif [ "$person" == "jrya" ]; then
 
     echo "Running as jrya - Setting specific experiment parameters for jrya computer"
     
-	declare -i trials=30
+	declare -i trials=15
 	declare -i warmups=10
 	n=8192
-	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 400 1000)
+	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	num_ps=${#ps[@]}
 	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
@@ -67,10 +67,10 @@ else
 	
 	declare -i trials=1
 	declare -i warmups=1
-	n=1536
-	ps=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
+	n=500
+	ps=(4 5 6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	num_ps=${#ps[@]}
-	sparsity_values=(20 30 40 50 60 70 80 85 90 95 97 98 99)
+	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 	measure="mm" # options: all, packing, mm
 
@@ -87,6 +87,7 @@ do
 	do
 		for sparsity_pattern in ${sparsity_patterns[@]};
 		do
+			echo $sp $p $sparsity_pattern
 			./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $measure
 		done
 	done
@@ -111,7 +112,7 @@ nameHype=$unscr$hyperthreading$unscr$person
 
 cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
-python3 plots_p_extensive.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n_start $n_end $n_step $FILE $nameHype
+python3 plots_p_final.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"

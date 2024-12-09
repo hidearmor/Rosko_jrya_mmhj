@@ -27,15 +27,17 @@ double rosko_sgemm_p_exploration(float* A, float* B, float* C, int M, int N, int
 	blk_dims_t* x = (blk_dims_t*) malloc(sizeof(blk_dims_t));
 
 
-
 	init_sparse_block_dims(M, N, K, p, x, cake_cntx, sch, argv, density, 4, alg, mcu, kcu, ncu);
 	omp_set_num_threads(p);
 	// JONAS OMP
-	printf("\nnumber of threads assigned OpenMP = %d", p);
-	printf("\nnumber of threads from OpenMP = %d", omp_get_num_threads());
-	printf("\nmax # of threads from OpenMP = %d", omp_get_max_threads());
-	printf("\nthread number from OpenMP = %d", omp_get_thread_num());
-	printf("\n");
+	bool print_debug = false;
+	if (print_debug == true) {
+		printf("\nnumber of threads assigned OpenMP = %d", p);
+		printf("\nnumber of threads from OpenMP = %d", omp_get_num_threads());
+		printf("\nmax # of threads from OpenMP = %d", omp_get_max_threads());
+		printf("\nthread number from OpenMP = %d", omp_get_thread_num());
+		printf("\n");
+	}
 
 	if(DEBUG) printf("m_r = %d, n_r = %d\n\n", cake_cntx->mr, cake_cntx->nr);
 	if(DEBUG) printf("mc = %d, kc = %d, nc = %d, alpha_n = %f\n", x->m_c, x->k_c, x->n_c, cake_cntx->alpha_n);
@@ -172,7 +174,7 @@ double rosko_sgemm_p_exploration(float* A, float* B, float* C, int M, int N, int
 	if(DEBUG) printf("full gemm time: %f \n", diff_t); 	// exit(1);
 
 	// JONAS indside times
-	printf("\ninside time: %f", diff_t);
+	// printf("\ninside time: %f", diff_t);
 
 	times = diff_t;
 
