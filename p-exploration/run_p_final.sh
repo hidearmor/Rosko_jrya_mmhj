@@ -10,6 +10,21 @@ cd $x;
 echo $ROSKO_HOME;
 echo $CAKE_HOME;
 
+make clean;
+make;
+
+FILE="results_p_extensive"
+
+# Check if the results file already exists
+if [ -f "$FILE" ]; then
+	rm -f $FILE
+    echo "File '$FILE' exists. Removing..."
+else
+    echo "File '$FILE' does not exist."
+fi
+
+echo "algo,p,sp,M,K,N,sppattern,rosko-time,outer-time,ntrials,measure" >> $FILE
+
 # Check if the "person" argument is provided
 if [ -z "$1" ]; then
     echo "Error: No argument provided. Please specify who is running the experiment (e.g., mmhj or jrya)."
@@ -18,8 +33,6 @@ fi
 
 # Set the "person" variable based on the first argument
 person=$1
-
-FILE="results_p_extensive"
 
 # Perform different actions based on the value of "person"
 if [ "$person" == "mmhj" ]; then
@@ -64,9 +77,25 @@ else
 fi
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
+sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
+num_sparsity_patterns=${#sparsity_patterns[@]}
+
+
+for sp in ${sparsity_values[@]};
+do
+	for p in ${ps[@]};
+	do
+		for sparsity_pattern in ${sparsity_patterns[@]};
+		do
+			./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $measure
+		done
+	done
+done	
+
 
 
 ### PLOTS PART ####
+# exit 0 # exit without plots and files errors
 
 PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
@@ -80,7 +109,12 @@ time=$(echo "$output" | sed -n '2p')
 unscr="_"
 nameHype=$unscr$hyperthreading$unscr$person
 
+cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
+
 python3 plots_p_extensive.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n_start $n_end $n_step $FILE $nameHype
 
+commit_hash=$(git rev-parse HEAD)
+logName="commit_hash"
+echo "$commit_hash" > $path$time$unscr$logName$unscr$FILE$nameHype
 
 #####################
