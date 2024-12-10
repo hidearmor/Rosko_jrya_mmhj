@@ -42,9 +42,11 @@ elif [ "$person" == "jrya" ]; then
 	declare -i trials=15
 	declare -i warmups=10
 	n=8192
-	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
+	ps=(50 75 100 125)
+	# ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	num_ps=${#ps[@]}
-	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
+	sparsity_values=(95 97 98 99 99.9)
+	# sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 	measure="mm" # options: all, packing, mm
 
