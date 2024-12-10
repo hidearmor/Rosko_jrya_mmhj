@@ -64,10 +64,8 @@ elif [ "$person" == "jrya" ]; then
     
 	declare -i trials=30
 	declare -i warmups=10
-	# declare -i n=6144
 	declare -i n=8192
-	# declare -i cores=6
-	declare -i cores=40
+	declare -i cores=6
 
 else
 
@@ -85,9 +83,6 @@ hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 algorithms=("rosko" "numpy_csr" "numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-# sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
-# sparsity_values=(99 99.5 99.8 99.9)
-# sparsity_values=(97 98 99 99.5 99.8 99.9)
 sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
@@ -96,7 +91,7 @@ for sp in ${sparsity_values[@]};
 do
 
 	./rosko_sgemm_test 	$n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
-	if [ "$sp" -gt 80 ]; then
+	if awk "BEGIN {exit !($sp > 90.0)}"; then
 		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
 	fi
 	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
