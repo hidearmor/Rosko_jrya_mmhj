@@ -82,7 +82,7 @@ void pack_A_csr_to_sp_k_first(csr_t* csr, int M, int K, int nz, int p,
 }
 
 
-
+// Jonas here is the scheduling of the packing
 void pack_A_sp_k_first(float* A, float* A_p, int M, int K, int p, 
    sp_pack_t* sp_pack, blk_dims_t* x, cake_cntx_t* cake_cntx) {
    
@@ -108,7 +108,7 @@ void pack_A_sp_k_first(float* A, float* A_p, int M, int K, int p,
    unsigned char* loc_m = (unsigned char*) calloc(x->M_padded*K , sizeof(unsigned char)); // array for storing M dim C writeback location for each nnz in A
                                     // each value ranges from 0 to mr-1
 
-
+   // Jonas here START the scheduling of the packing
    for(m = 0; m < Mb; m++) {
 
       if((m == Mb - 1) && m_pad) {
@@ -144,13 +144,19 @@ void pack_A_sp_k_first(float* A, float* A_p, int M, int K, int p,
                pad = 0;
             }
 
+            // Jonas here is the REAL Packing
+            // Vi smider bare arrays og start-placering til dem ind
+            // sammen med dimensions etc. som er info til hvor meget
+            // vi må bevæge os i de her arrays
+            // dvs vi packer på mikro niveau, men alle vores 
+            // "tiles" ligger i de samme arrays is memory
             pack_ob_A_sp(&A[A_offset + core*m_c_x*K], &A_p[A_p_offset + core*m_c_x*k_c_t], 
                &nnz_outer[(A_p_offset + core*m_c_x*k_c_t) / m_r], 
                &k_inds[(A_p_offset + core*m_c_x*k_c_t) / m_r], 
                &loc_m[A_p_offset + core*m_c_x*k_c_t],
                M, K, m*p*m_c, core*m_c_x, m_c_t, k_c_t, m_r, pad);
          }
-
+         
          A_p_offset += m_cb*k_c_t;
       }
    }
