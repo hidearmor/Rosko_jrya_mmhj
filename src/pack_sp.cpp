@@ -151,12 +151,12 @@ void pack_A_sp_k_first(float* A, float* A_p, int M, int K, int p,
             // dvs vi packer på mikro niveau, men alle vores 
             // "tiles" ligger i de samme arrays is memory
             pack_ob_A_sp(&A[A_offset + core*m_c_x*K], &A_p[A_p_offset + core*m_c_x*k_c_t], 
-               &nnz_outer[(A_p_offset + core*m_c_x*k_c_t) / m_r], 
-               &k_inds[(A_p_offset + core*m_c_x*k_c_t) / m_r], 
+               &nnz_outer[(A_p_offset + core*m_c_x*k_c_t) / m_r], // this is not max K as we thought, but: max K * (M / m_r) / 4 (since it's not 32 bits but 8)
+               &k_inds[(A_p_offset + core*m_c_x*k_c_t) / m_r], // same with this
                &loc_m[A_p_offset + core*m_c_x*k_c_t],
                M, K, m*p*m_c, core*m_c_x, m_c_t, k_c_t, m_r, pad);
          }
-         
+
          A_p_offset += m_cb*k_c_t;
       }
    }
