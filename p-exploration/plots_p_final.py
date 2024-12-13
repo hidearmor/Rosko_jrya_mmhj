@@ -103,26 +103,28 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         title = titles[i_spp]
         official_title = title[0].title() + title[1 :]
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
-        ax.set_xlabel("p")
+        ax.set_xlabel("Threads (p)")
         ax.set_xlim(ps_min, ps_max)
         # ax.set_xticks(np.arange(ps_min, ps_max+1, 20.0))
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_ylabel("Sparsity (sp)")
+        ax.set_ylabel("Sparsity [%]")
         ax.set_yticks(np.arange(sparsities_min, sparsities_max+1, 10.0))
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.invert_yaxis()
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
-        ax.set_zlabel("Runtime (sec)")
+        ax.set_zlabel("Running time [sec]")
         ax.set_zlim(min_runtime, max_runtime)
         ax.view_init(18,-32)
         
 
 
     # Add a single, shared color bar on the right side of all plots
-    fig.colorbar(surf, ax=axes[:], location='right', shrink=0.3, label="Runtime (sec)")
+    fig.colorbar(surf, ax=axes[:], location='right', shrink=0.3, label="Running time [sec]")
 
     # Add the title for the whole figure
-    official_suptitle = "3D Runtime Surface Plots for Rosko, for Different Sparsity Patterns and N=" + str(n)
+    # official_suptitle = "3D Running time Surface Plots for Rosko, for Different Sparsity Patterns and N=" + str(n)
+    official_suptitle = "3D running time surface plots for Rosko, for different sparsity patterns on Intel-i5"
+    # official_suptitle = "3D running time surface plots for Rosko, for different sparsity patterns on Intel-i7"
     fig.suptitle(official_suptitle, fontsize=16)
     # fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
     # fig.align_titles()

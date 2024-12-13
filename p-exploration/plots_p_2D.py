@@ -12,16 +12,16 @@ from matplotlib import ticker as mticker
 
 # GLOBAL VARIABLES
 # FYI: currently markers and colors only allow for 10 algorithms in one plot, each with a distinctive marker and color
-ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko'}
-                            #  'numpy_arr':'Array-Numpy', 
-                            #  'numpy_csr':'CSR-Numpy', 
-                            #  'naive':'Naive', 
-                            #  'numpy_dense':'Array-Numpy, zeros stripped', 
-                            #  'numpy_dia':'Diagonal-Numpy'}
-ALLOWED_SPARSITY_PATTERNS = ['random-uniform']
-                            #  'row-pattern', 
-                            #  'diagonal', 
-                            #  'column-pattern'] # If changed, then update makeTitle()
+ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko',
+                             'numpy_arr':'Array-Numpy', 
+                             'numpy_csr':'CSR-Numpy', 
+                             'naive':'Naive', 
+                             'numpy_dense':'Array-Numpy, zeros stripped', 
+                             'numpy_dia':'Diagonal-Numpy'}
+ALLOWED_SPARSITY_PATTERNS = ['random-uniform',
+                             'row-pattern', 
+                             'diagonal', 
+                             'column-pattern'] # If changed, then update makeTitle()
 
 DEBUG = False
 
@@ -62,8 +62,8 @@ def plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title
 	# plt.ticklabel_format(useOffset=False, style='plain')
 	# plt.title('SpMM runtime at various sparsities,\nusing ' + title, fontsize = 18 )
 	plt.title(title, fontsize = 18 )
-	plt.xlabel("Sparsity (%)", fontsize = 16)
-	plt.ylabel("Runtime (sec)", fontsize = 16)
+	plt.xlabel("Sparsity [%]", fontsize = 16)
+	plt.ylabel("Running time [sec]", fontsize = 16)
 	plt.yticks( fontsize = 10)
 	plt.xticks( fontsize = 10)
 	# num_ticks = len(sparsities) # Number of x-ticks you want
@@ -97,7 +97,7 @@ def isAlgoValid(algo):
 
  
 def makeTitle(sparsity_pattern):
-	return "Rosko running time with varying p values\nIntel Core i5, N = 8192"
+	return "Running time plot for Rosko with varying threads p on Intel-i5"
 
 def makeLabel(p):
 	return 'p=' + str(p)
