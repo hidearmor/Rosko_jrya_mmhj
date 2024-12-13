@@ -12,12 +12,13 @@ from matplotlib import ticker as mticker
 
 # GLOBAL VARIABLES
 # FYI: currently markers and colors only allow for 10 algorithms in one plot, each with a distinctive marker and color
-ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko', 
-                             'numpy_arr':'Array-Numpy', 
-                             'numpy_csr':'CSR-Numpy', 
+ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko',
+							 'rosko_base':'Rosko Baseline', 
+                             'numpy_arr':'NumPy-Dense', 
+                             'numpy_csr':'NumPy-CSR', 
                              'naive':'Naive', 
-                             'numpy_dense':'Array-Numpy, zeros stripped', 
-                             'numpy_dia':'Diagonal-Numpy'}
+                             'numpy_dense':'NumPy-Dense, zeros stripped', 
+                             'numpy_dia':'Numpy-Diagonal'}
 ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 
                              'row-pattern', 
                              'diagonal', 
@@ -44,24 +45,27 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	creation_datetime = datetime.datetime.fromtimestamp(file_path.stat().st_ctime)
 	plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
 	
-	
 	plt.figure(figsize = (6,4))
 	for i in range(len(algos)):
 		algo_time = dft[dft['algo'] == algos[i]]['time'].values
 		algo_sparsities = dft[dft['algo'] == algos[i]]['sp'].values
-		plt.plot(algo_sparsities, algo_time, label = labels[i], marker = markers[i], color = colors[i])
+		if algos[i] == 'rosko_base':
+			plt.plot(algo_sparsities, algo_time, ls = '--', label = labels[i], marker = markers[i], color = colors[i])
+		else:	
+			plt.plot(algo_sparsities, algo_time, label = labels[i], marker = markers[i], color = colors[i])
 		
 	
 	# plt.ticklabel_format(useOffset=False, style='plain')
-	plt.title('SpMM runtime at various sparsities,\nusing ' + title, fontsize = 18 )
-	plt.xlabel("Sparsity (%)", fontsize = 16)
-	plt.ylabel("Runtime (sec)", fontsize = 16)
+	plt.title('(b) SDMM on Intel Core i7 using\n' + title, fontsize = 18 )
+	# plt.title('(a) SDMM on Intel Core i5 using ' + title, fontsize = 18 )
+	plt.xlabel("Sparsity [%]", fontsize = 16)
+	plt.ylabel("Running time [sec]", fontsize = 16)
 	plt.yticks( fontsize = 10)
 	plt.xticks( fontsize = 10)
 	# num_ticks = len(sparsities) # Number of x-ticks you want
 	# plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
 	# plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
-	plt.legend(loc = "upper right", prop={'size': 14})
+	plt.legend(loc = "upper right", prop={'size': 12})
 	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
 	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
 	plt.savefig("%s%s_%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
@@ -114,7 +118,7 @@ def makeLabel(matchType, algo):
 		return ALLOWED_ALGOS_WITH_LABEL[algo]
 	if matchType == "first half":
 		first_half, second_half = algo.split("_", 1)  # Split on first underscore only
-		return f"{ALLOWED_ALGOS_WITH_LABEL[first_half]}, with {second_half}"
+		return f"{ALLOWED_ALGOS_WITH_LABEL[first_half]}, with {second_half}" # Only for handling p=x
 	else:
 		raise ValueError(f"There is no valid label for algorithm {algo}.")
 

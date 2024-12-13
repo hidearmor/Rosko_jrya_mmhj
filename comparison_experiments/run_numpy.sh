@@ -53,9 +53,9 @@ if [ "$person" == "mmhj" ]; then
 
     echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
     
-	declare -i trials=10
+	declare -i trials=30
 	declare -i warmups=10
-	declare -i n=2000
+	declare -i n=4096
 	declare -i cores=4
 
 elif [ "$person" == "jrya" ]; then
