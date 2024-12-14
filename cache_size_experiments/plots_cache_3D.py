@@ -134,7 +134,7 @@ def plot_3D_cache_sp(
         ylabel = "Sparsity [%]" if plot_type == 'sp' else "p"
         ax.set_ylabel(ylabel)
 
-        ax.set_yticks(np.arange(comparison_elem_min, comparison_elem_max+1, 10.0))
+        # ax.set_yticks(np.arange(comparison_elem_min, comparison_elem_max+1, 10.0))
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.invert_yaxis()
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
@@ -225,7 +225,7 @@ def main():
     ps = []
 
     for i in range(num_ps):
-        p = sys.argv[inc(j)]
+        p = int(sys.argv[inc(j)])
         ps.append(p)
 
     # Read the n-parameters
