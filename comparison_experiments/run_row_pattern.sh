@@ -55,7 +55,8 @@ if [ "$person" == "mmhj" ]; then
     
 	declare -i trials=30
 	declare -i warmups=10
-	declare -i n=4096
+	# declare -i n=4096
+	declare -i n=6144
 	declare -i cores=4
 
 elif [ "$person" == "jrya" ]; then
