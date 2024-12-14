@@ -1,0 +1,8 @@
+algo,p,sp,M,K,N,sppattern,time,ntrials,L3_size
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.370455,3
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.592628,3
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.630178,3
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.731135,3
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.718085,3
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.817515,3
+rosko,6,90.000000,8192,8192,8192,random-uniform,1.996493,3
