@@ -118,7 +118,7 @@ def makeLabel(matchType, algo):
 		return ALLOWED_ALGOS_WITH_LABEL[algo]
 	if matchType == "first half":
 		first_half, second_half = algo.split("_", 1)  # Split on first underscore only
-		return f"{ALLOWED_ALGOS_WITH_LABEL[first_half]}, with {second_half}" # Only for handling p=x
+		return f"{ALLOWED_ALGOS_WITH_LABEL[first_half]}, {second_half}" # Only for handling p=x
 	else:
 		raise ValueError(f"There is no valid label for algorithm {algo}.")
 
