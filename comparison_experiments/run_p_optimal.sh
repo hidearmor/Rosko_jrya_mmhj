@@ -58,6 +58,7 @@ if [ "$person" == "mmhj" ]; then
 	declare -i n=2000
 	ps=(4 20)
 	num_ps=${#ps[@]}
+	declare -i cores=4
 
 elif [ "$person" == "jrya" ]; then
 
@@ -70,6 +71,7 @@ elif [ "$person" == "jrya" ]; then
 	declare -i n=200
 	ps=(6 10 20 40 43 46 50)
 	num_ps=${#ps[@]}
+	declare -i cores=6
 
 else
 
@@ -80,31 +82,41 @@ else
 	declare -i n=512
 	ps=(4 20)
 	num_ps=${#ps[@]}
+	declare -i cores=1
 
 fi
 
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
-sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
-sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
-num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
-
+algorithms=("numpy_arr" "numpy_csr")  # options: rosko, rosko_base, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 # Loop over ps to build the algorithms array
 for p in ${ps[@]}; 
 do
     algorithms+=("rosko_p=$p")
 done
+num_algorithms=${#algorithms[@]}  # the number of algorithms used in this experiment
+sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
+sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
+num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
+
 
 num_algorithms=${#algorithms[@]}  # the number of algorithms used in this experiment
 
 for sp in ${sparsity_values[@]};
 do
+	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
+
+	if awk "BEGIN {exit !($sp > 70.0)}"; then
+		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
+	fi
+
 	for p in ${ps[@]}
 	do
-
-		./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko_p=$p $FILE
-		
+		./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko_p=$p $FILE	
 	done
+
+
+
 done
 
 # exit 0 # exit without errors
