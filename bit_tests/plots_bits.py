@@ -12,7 +12,8 @@ from matplotlib import ticker as mticker
 
 # GLOBAL VARIABLES
 # FYI: currently markers and colors only allow for 5 algorithms in one plot, each with a distinctive marker and color
-ALLOWED_ALGOS_WITH_LABEL =  {'numpy_csr':'CSR-Numpy'}
+ALLOWED_ALGOS_WITH_LABEL =  {'numpy_csr':'NumPy-CSR',
+							 'numpy_arr':'NumPy-Dense'}
 ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 
                              'row-pattern', 
                              'diagonal', 
@@ -25,7 +26,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 	
 
-def plot_comparison(algos, sparsities, sparsity_pattern, title, results_fname, env_details, bits, fname = "plot_bits"):
+def plot_comparison(algos, label, sparsities, sparsity_pattern, title, results_fname, env_details, bits, fname = "plot_bits"):
 	plt.rcParams.update({'font.size': 12})
 	markers = ['o','v','s','d','^']
 	colors = ['b','g','k','r','r']
@@ -43,13 +44,16 @@ def plot_comparison(algos, sparsities, sparsity_pattern, title, results_fname, e
 		print('hehe')
 		algo_time = dft[dft['bits'] == bits[i]]['time'].values
 		algo_sparsities = dft[dft['bits'] == bits[i]]['sp'].values
-		plt.plot(algo_sparsities, algo_time / (100-algo_sparsities), label = str(bits[i]) + ' bits', marker = markers[i], color = colors[i])
+		plt.plot(algo_sparsities, algo_time / (100-algo_sparsities), label = str(bits[i]) + '-bit', marker = markers[i], color = colors[i])
 		
 	
-	plt.title('Numpy dense 32 VS 64 bit floats', fontsize = 24)
-	plt.xlabel("Sparsity (%)", fontsize = 16)
-	plt.ylabel("Running time / density", fontsize = 16)
-	plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
+	plt.title("%s 32 vs. 64 bit floats\non Intel Core i7" % (label), fontsize = 24)
+	# plt.title("%s 32 vs. 64 bit floats on Intel Core i5" % (label), fontsize = 24)
+	plt.xlabel("Sparsity [%]", fontsize = 16)
+	plt.ylabel("Running time [sec]", fontsize = 16)
+	# plt.ylabel("Running time / density", fontsize = 16)
+	# plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
+	plt.xticks( fontsize = 10)
 	plt.yticks( fontsize = 10)
 	plt.legend(loc = "center right", prop={'size': 12})
 	plt.savefig("%s%s_%s_%s.pdf" % (plotsDir, dateStr, fname, env_details), bbox_inches='tight')
@@ -98,6 +102,7 @@ def main():
 			print(algo + " is not a valid algorithm\n")
 			sys.exit()
 		algos.append(algo)
+		label = ALLOWED_ALGOS_WITH_LABEL[algo]
 
 	bits = [32, 64]
 
@@ -122,7 +127,7 @@ def main():
 		print(sparsity_pattern, algos, sparsities)
   
 	# Create the plot
-	plot_comparison(algos, sparsities, sparsity_pattern, title, results_fname, env_details, bits)
+	plot_comparison(algos, label, sparsities, sparsity_pattern, title, results_fname, env_details, bits)
     
     
 

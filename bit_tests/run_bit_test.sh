@@ -30,9 +30,11 @@ hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 person=$1 # argument for who is doing dis
 declare -i trials=30
 declare -i warmups=10
-declare -i n=4192
-declare -i cores=6
-algorithms=("rosko" "numpy_csr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+declare -i n=6144
+# declare -i n=4192
+# declare -i cores=6
+declare -i cores=4
+algorithms=("numpy_arr")  # options: rosko, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]} # the number of algorithms used in this experiment
 sparsity_pattern="random-uniform"  # options: random-uniform, diagonal, row-pattern, column-pattern
 sparsity_values=(60 70 80 90 95 98 99)  # Define sparsity values as an array
@@ -41,8 +43,8 @@ num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used 
 
 for sp in ${sparsity_values[@]};
 do
-	python3 numscipy_mm_test_32.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE 32
-	python3 numscipy_mm_test_64.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE 64
+	python3 numscipy_mm_test_32.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE 32
+	python3 numscipy_mm_test_64.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE 64
 done
 
 # exit 0 # exit without errors
