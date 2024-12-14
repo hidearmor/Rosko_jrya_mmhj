@@ -296,6 +296,8 @@ def main():
     for i in range(L3_factors_length):
         L3_factors.append(sys.argv[inc(j)])
 
+    plot_p_or_sp = sys.argv[inc(j)]
+
     # Define part of the plot-title depending on the sparsity pattern
     titles = [makeTitle(sppattern) for sppattern in sparsity_patterns]
 

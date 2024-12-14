@@ -85,8 +85,8 @@ do
 		do
 			for L3_factor in ${L3_factors[@]}
 			do
-				echo $sp $p $sparsity_pattern
-				./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $measure $L3_factor
+				# echo $n $p $sp $sparsity_pattern $L3_factor
+				./rosko_sgemm_test 	$n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
 			done
 		done
 	done
@@ -95,7 +95,7 @@ done
 
 
 ### PLOTS PART ####
-# exit 0 # exit without plots and files errors
+exit 0 # exit without plots and files errors
 
 PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
@@ -111,7 +111,7 @@ nameHype=$unscr$hyperthreading$unscr$person
 
 cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
-python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]}
+python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} p
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"
