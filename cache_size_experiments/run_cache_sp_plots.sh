@@ -15,15 +15,15 @@ make;
 
 FILE="results_cache_sp"
 
-# Check if the results file already exists
-if [ -f "$FILE" ]; then
-	rm -f $FILE
-    echo "File '$FILE' exists. Removing..."
-else
-    echo "File '$FILE' does not exist."
-fi
+# # Check if the results file already exists
+# if [ -f "$FILE" ]; then
+# 	rm -f $FILE
+#     echo "File '$FILE' exists. Removing..."
+# else
+#     echo "File '$FILE' does not exist."
+# fi
 
-echo "algo,p,sp,M,K,N,sppattern,rosko-time,ntrials,L3_factor,L3_size" >> $FILE
+# echo "algo,p,sp,M,K,N,sppattern,rosko-time,outer-time,ntrials,L3_factor,L3_size" >> $FILE
 
 # Check if the "person" argument is provided
 if [ -z "$1" ]; then
@@ -82,24 +82,24 @@ num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}
 
 
-for sp in ${sparsity_values[@]};
-do
-	for p in ${ps[@]};
-	do
-		for sparsity_pattern in ${sparsity_patterns[@]};
-		do
-			for L3_factor in ${L3_factors[@]}
-			do
-				# echo $n $p $sp $sparsity_pattern $L3_factor
-				./rosko_sgemm_test 	$n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
-			done
-		done
-	done
-done	
+# for sp in ${sparsity_values[@]};
+# do
+# 	for p in ${ps[@]};
+# 	do
+# 		for sparsity_pattern in ${sparsity_patterns[@]};
+# 		do
+# 			for L3_factor in ${L3_factors[@]}
+# 			do
+# 				# echo $n $p $sp $sparsity_pattern $L3_factor
+# 				./rosko_sgemm_test 	$n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
+# 			done
+# 		done
+# 	done
+# done	
 
 
 ### PLOTS PART ####
-exit 0 # exit without plots and files errors
+# exit 0 # exit without plots and files errors
 
 PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
@@ -114,12 +114,12 @@ unscr="_"
 nameHype=$unscr$hyperthreading$unscr$person
 plot_type="sp"
 
-cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
+# cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
 python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
 
-commit_hash=$(git rev-parse HEAD)
-logName="commit_hash"
-echo "$commit_hash" > $path$time$unscr$logName$unscr$FILE$nameHype
+# commit_hash=$(git rev-parse HEAD)
+# logName="commit_hash"
+# echo "$commit_hash" > $path$time$unscr$logName$unscr$FILE$nameHype
 
 #####################

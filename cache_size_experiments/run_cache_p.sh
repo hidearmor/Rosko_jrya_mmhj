@@ -23,7 +23,7 @@ else
     echo "File '$FILE' does not exist."
 fi
 
-echo "algo,p,sp,M,K,N,sppattern,rosko-time,outer-time,ntrials,measure" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,rosko-time,ntrials,L3_factor,L3_size" >> $FILE
 
 # Check if the "person" argument is provided
 if [ -z "$1" ]; then
@@ -59,10 +59,10 @@ else
 
     echo "Running as another user - Applying general settings"
 	
-	declare -i trials=1
+	declare -i trials=2
 	declare -i warmups=1
-	n=500
-	ps=(4 5 6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
+	n=2000
+	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	measure="mm" # options: all, packing, mm
 
 fi
@@ -109,9 +109,11 @@ time=$(echo "$output" | sed -n '2p')
 unscr="_"
 nameHype=$unscr$hyperthreading$unscr$person
 
+plot_type="p"
+
 cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
-python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} p
+python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"

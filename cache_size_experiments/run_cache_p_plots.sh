@@ -13,17 +13,17 @@ echo $CAKE_HOME;
 make clean;
 make;
 
-FILE="results_cache_sp"
+FILE="results_cache_p"
 
-# Check if the results file already exists
-if [ -f "$FILE" ]; then
-	rm -f $FILE
-    echo "File '$FILE' exists. Removing..."
-else
-    echo "File '$FILE' does not exist."
-fi
+# # Check if the results file already exists
+# if [ -f "$FILE" ]; then
+# 	rm -f $FILE
+#     echo "File '$FILE' exists. Removing..."
+# else
+#     echo "File '$FILE' does not exist."
+# fi
 
-echo "algo,p,sp,M,K,N,sppattern,rosko-time,ntrials,L3_factor,L3_size" >> $FILE
+# echo "algo,p,sp,M,K,N,sppattern,rosko-time,ntrials,L3_factor,L3_size" >> $FILE
 
 # Check if the "person" argument is provided
 if [ -z "$1" ]; then
@@ -41,10 +41,8 @@ if [ "$person" == "mmhj" ]; then
     
 	declare -i trials=15
 	declare -i warmups=10
-	n=6144
-	ps=(4)
-	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
-	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
+	n=8192
+	ps=(4 5 6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	measure="mm" # options: all, packing, mm
 
 elif [ "$person" == "jrya" ]; then
@@ -54,54 +52,52 @@ elif [ "$person" == "jrya" ]; then
 	declare -i trials=15
 	declare -i warmups=10
 	n=8192
-	ps=(6)
-	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
-	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
+	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	measure="mm" # options: all, packing, mm
 
 else
 
     echo "Running as another user - Applying general settings"
 	
-	declare -i trials=6
-	declare -i warmups=2
-	# n=8192
-	n=3000
-	ps=(6)
-	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
-	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
+	declare -i trials=2
+	declare -i warmups=1
+	n=2000
+	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
 	measure="mm" # options: all, packing, mm
 
 fi
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
-L3_factors=(0.1 0.25 0.5 1.0 1.1 1.5 2.0)
 num_sparsity_patterns=${#sparsity_patterns[@]}
+L3_factors=(0.1 0.25 0.5 1.0 1.1 1.5 2.0)
+sparsity_values=(90)
 num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}
+num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
 
-for sp in ${sparsity_values[@]};
-do
-	for p in ${ps[@]};
-	do
-		for sparsity_pattern in ${sparsity_patterns[@]};
-		do
-			for L3_factor in ${L3_factors[@]}
-			do
-				# echo $n $p $sp $sparsity_pattern $L3_factor
-				./rosko_sgemm_test 	$n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
-			done
-		done
-	done
-done	
+# for sp in ${sparsity_values[@]};
+# do
+# 	for p in ${ps[@]};
+# 	do
+# 		for sparsity_pattern in ${sparsity_patterns[@]};
+# 		do
+# 			for L3_factor in ${L3_factors[@]}
+# 			do
+# 				# echo $n $p $sp $sparsity_pattern $L3_factor
+# 				./rosko_sgemm_test 	$n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
+# 			done
+# 		done
+# 	done
+# done	
+
 
 
 ### PLOTS PART ####
-exit 0 # exit without plots and files errors
+# exit 0 # exit without plots and files errors
 
-PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
+# PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
 cwd=$PWD
 # Call the Python script with the function name as an argument
@@ -112,14 +108,15 @@ path=$(echo "$output" | sed -n '1p')
 time=$(echo "$output" | sed -n '2p')
 unscr="_"
 nameHype=$unscr$hyperthreading$unscr$person
-plot_type="sp"
 
-cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
+plot_type="p"
+
+# cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
 python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
 
-commit_hash=$(git rev-parse HEAD)
-logName="commit_hash"
-echo "$commit_hash" > $path$time$unscr$logName$unscr$FILE$nameHype
+# commit_hash=$(git rev-parse HEAD)
+# logName="commit_hash"
+# echo "$commit_hash" > $path$time$unscr$logName$unscr$FILE$nameHype
 
 #####################

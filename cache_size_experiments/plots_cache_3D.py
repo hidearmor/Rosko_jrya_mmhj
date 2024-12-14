@@ -2,7 +2,7 @@ import pandas
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import matplotlib.cm as cm
-import matplotlib as mpl
+# import matplotlib as mpl
 import numpy as np
 import datetime
 import os
@@ -65,14 +65,14 @@ def plot_3D_cache_sp(
     L3_factor_min = round(float(min(L3_factors)), 1)
     L3_factor_max = round(float(max(L3_factors)), 1)
 
-    comparison_elem_min = round(float(min(ps)), 1) if plot_type == 'p' else round(float(min(sparsities)), 1)
-    comparison_elem_max = round(float(max(ps)), 1) if plot_type == 'p' else  round(float(max(sparsities)), 1)
+    comparison_elem_min = int(min(ps)) if plot_type == 'p' else round(float(min(sparsities)), 1)
+    comparison_elem_max = int(max(ps)) if plot_type == 'p' else round(float(max(sparsities)), 1)
 
     filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & \
-             (round(dft['L3_factor'], 1) >= L3_factor_min) & \
-             (round(dft['L3_factor'], 1) <= L3_factor_max) & \
-             (round(dft[plot_type], 1) >= comparison_elem_min) & \
-             (round(dft[plot_type], 1) <= comparison_elem_max)
+             (dft['L3_factor'] >= L3_factor_min) & \
+             (dft['L3_factor'] <= L3_factor_max) & \
+             (dft[plot_type] >= comparison_elem_min) & \
+             (dft[plot_type] <= comparison_elem_max)
     
     min_runtime = dft[filter]['rosko-time'].min()
     max_runtime = dft[filter]['rosko-time'].max()
@@ -90,10 +90,15 @@ def plot_3D_cache_sp(
 
     for i_spp in range(len(sparsity_patterns)):
         constants_filter = filter & (dft['sppattern'] == sparsity_patterns[i_spp])
-        # rosko_L3_factor = dft[constants_filter]['p']
+
         rosko_L3_factor = dft[constants_filter]['L3_factor']
         rosko_comparison_elem = dft[constants_filter]['p'] if plot_type == 'p' else dft[constants_filter]['sp']
         rosko_times = dft[constants_filter][time_type]
+
+        if len(rosko_L3_factor) == 0 or len(rosko_comparison_elem) == 0 or len(rosko_times) == 0:
+            print(f"\nSkipping plot for sparsity pattern '{sparsity_patterns[i_spp]}' due to insufficient data.")
+            print('L3 ', len(rosko_L3_factor), 'rosko times: ', len(rosko_times), 'other: ', len(rosko_comparison_elem))
+            continue
 
         if DEBUG:
             print(dft.dtypes)
@@ -123,11 +128,10 @@ def plot_3D_cache_sp(
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
         ax.set_xlabel("L3 multiply factor")
         ax.set_xlim(L3_factor_min, L3_factor_max)
-        # ax.set_xlim(ps_min, ps_max)
-        # ax.set_xticks(np.arange(ps_min, ps_max+1, 20.0))
+        # ax.set_xticks(np.arange(L3_factor_min, L3_factor_max+1, 1.0)) 
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-        ylabel = 'sp' if plot_type == "Sparsity [%]" else "p"
+        ylabel = "Sparsity [%]" if plot_type == 'sp' else "p"
         ax.set_ylabel(ylabel)
 
         ax.set_yticks(np.arange(comparison_elem_min, comparison_elem_max+1, 10.0))
@@ -213,7 +217,7 @@ def main():
     sparsities = []
 
     for i in range(num_sparsities):
-        sparsity = sys.argv[inc(j)]
+        sparsity = float(sys.argv[inc(j)])
         sparsities.append(sparsity)
 
     # Read the core values
@@ -240,7 +244,7 @@ def main():
     L3_factors_length = int(sys.argv[inc(j)])
     L3_factors = []
     for i in range(L3_factors_length):
-        L3_factors.append(sys.argv[inc(j)])
+        L3_factors.append(float(sys.argv[inc(j)]))
 
     plot_type = sys.argv[inc(j)]
 
