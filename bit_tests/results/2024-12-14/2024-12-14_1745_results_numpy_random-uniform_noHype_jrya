@@ -1,0 +1,15 @@
+algo,p,sp,M,K,N,sppattern,time,ntrials,bits
+numpy_arr,6,60.0,8192,8192,8192,random-uniform,1.876273,30,32
+numpy_arr,6,60.0,8192,8192,8192,random-uniform,3.816893,30,64
+numpy_arr,6,70.0,8192,8192,8192,random-uniform,1.87902,30,32
+numpy_arr,6,70.0,8192,8192,8192,random-uniform,3.813934,30,64
+numpy_arr,6,80.0,8192,8192,8192,random-uniform,1.848287,30,32
+numpy_arr,6,80.0,8192,8192,8192,random-uniform,3.747848,30,64
+numpy_arr,6,90.0,8192,8192,8192,random-uniform,1.843891,30,32
+numpy_arr,6,90.0,8192,8192,8192,random-uniform,3.8091,30,64
+numpy_arr,6,95.0,8192,8192,8192,random-uniform,1.882912,30,32
+numpy_arr,6,95.0,8192,8192,8192,random-uniform,3.784792,30,64
+numpy_arr,6,98.0,8192,8192,8192,random-uniform,1.876612,30,32
+numpy_arr,6,98.0,8192,8192,8192,random-uniform,3.807544,30,64
+numpy_arr,6,99.0,8192,8192,8192,random-uniform,1.871503,30,32
+numpy_arr,6,99.0,8192,8192,8192,random-uniform,3.813733,30,64
