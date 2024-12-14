@@ -76,7 +76,7 @@ fi
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
-L3_factors=(0.1 0.25 0.5 1.0 1.1 1.5 2.0)
+L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
 num_sparsity_patterns=${#sparsity_patterns[@]}
 num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}
@@ -99,7 +99,7 @@ done
 
 
 ### PLOTS PART ####
-exit 0 # exit without plots and files errors
+# exit 0 # exit without plots and files errors
 
 PYTHON_SCRIPT_PATH="$ROSKO_HOME/plotslib/plot_utils.py"
 FUNCTION_NAME="getPlotsDirectory"
@@ -116,7 +116,7 @@ plot_type="sp"
 
 cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
-python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
+# python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"
