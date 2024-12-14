@@ -13,11 +13,11 @@ from matplotlib import ticker as mticker
 # GLOBAL VARIABLES
 # FYI: currently markers and colors only allow for 10 algorithms in one plot, each with a distinctive marker and color
 ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko',
-                             'numpy_arr':'Array-Numpy', 
-                             'numpy_csr':'CSR-Numpy', 
+                             'numpy_arr':'NumPy-Dense', 
+                             'numpy_csr':'NumPy-CSR', 
                              'naive':'Naive', 
-                             'numpy_dense':'Array-Numpy, zeros stripped', 
-                             'numpy_dia':'Diagonal-Numpy'}
+                             'numpy_dense':'NumPy-Dense, zeros stripped', 
+                             'numpy_dia':'NumPy-Diagonal'}
 ALLOWED_SPARSITY_PATTERNS = ['random-uniform',
                              'row-pattern', 
                              'diagonal', 
@@ -50,6 +50,7 @@ def plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title
 	print(p_values)
 	# return
 	plt.figure(figsize = (6,4))
+
 	for i in range(len(p_values)):
 		p = int(p_values[i])
 		max_sp = float(max(sparsities))
@@ -60,7 +61,8 @@ def plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title
 
 	
 	# plt.ticklabel_format(useOffset=False, style='plain')
-	# plt.title('SpMM runtime at various sparsities,\nusing ' + title, fontsize = 18 )
+	plt.title('(b) SDMM on Intel Core i7 using\n' + title, fontsize = 18 )
+	# plt.title('(a) SDMM on Intel Core i5 using\n' + title, fontsize = 18 )
 	plt.title(title, fontsize = 18 )
 	plt.xlabel("Sparsity [%]", fontsize = 16)
 	plt.ylabel("Running time [sec]", fontsize = 16)
@@ -69,7 +71,7 @@ def plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title
 	# num_ticks = len(sparsities) # Number of x-ticks you want
 	# plt.xticks(np.linspace(min(sparsities), max(sparsities), num_ticks), fontsize=10)
 	# plt.xticks(np.asarray(sparsities, dtype=float), fontsize=10)
-	plt.legend(loc = "upper right", prop={'size': 14})
+	plt.legend(loc = "upper right", prop={'size': 12})
 	# plt.savefig("%s_perf.pdf" % (fname), bbox_inches='tight')
 	# plt.savefig("%s%s_%s_r%s_perf.pdf" % (plotsDir, dateStr, fname, runs), bbox_inches='tight')
 	plt.savefig("%s%s_%s_%s_%s_perf.pdf" % (plotsDir, dateStr, fname, sparsity_pattern, env_details), bbox_inches='tight')
@@ -100,7 +102,7 @@ def makeTitle(sparsity_pattern):
 	return "Running time plot for Rosko with varying threads p on Intel-i5"
 
 def makeLabel(p):
-	return 'p=' + str(p)
+	return 'p = ' + str(p)
 
 def main():
     
