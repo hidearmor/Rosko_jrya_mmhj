@@ -44,10 +44,11 @@ def plot_comparison(algos, label, sparsities, sparsity_pattern, title, results_f
 		print('hehe')
 		algo_time = dft[dft['bits'] == bits[i]]['time'].values
 		algo_sparsities = dft[dft['bits'] == bits[i]]['sp'].values
-		plt.plot(algo_sparsities, algo_time / (100-algo_sparsities), label = str(bits[i]) + '-bit', marker = markers[i], color = colors[i])
+		# plt.plot(algo_sparsities, algo_time / (100-algo_sparsities), label = str(bits[i]) + '-bit', marker = markers[i], color = colors[i])
+		plt.plot(algo_sparsities, algo_time, label = str(bits[i]) + '-bit', marker = markers[i], color = colors[i])
 		
 	
-	plt.title("%s 32 vs. 64 bit floats\non Intel Core i7" % (label), fontsize = 24)
+	plt.title("%s 32-bit vs. 64-bit\nfloats on Intel Core i7" % (label), fontsize = 24)
 	# plt.title("%s 32 vs. 64 bit floats on Intel Core i5" % (label), fontsize = 24)
 	plt.xlabel("Sparsity [%]", fontsize = 16)
 	plt.ylabel("Running time [sec]", fontsize = 16)

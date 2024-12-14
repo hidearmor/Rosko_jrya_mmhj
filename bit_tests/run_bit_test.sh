@@ -23,7 +23,7 @@ else
 fi
 
 
-echo "algo,p,sp,M,K,N,sppattern,time,ntrials, bits" >> $FILE
+echo "algo,p,sp,M,K,N,sppattern,time,ntrials,bits" >> $FILE
 
 # Experiment parameters setup
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)

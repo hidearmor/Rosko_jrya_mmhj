@@ -151,8 +151,8 @@ def main(N, M, K, p, sp_raw, trials, warmups, sp_pattern, algo, filename, bits):
     avg = round(res_total / trials, 6)
     file = open(filename, 'a')
     sp_print = round(sp*100, 2)
-    print(f'{algo},{p},{sp_print},{M},{K},{N},{sp_pattern},{avg},{trials}, {bits}')
-    file.write(f'{algo},{p},{sp_print},{M},{K},{N},{sp_pattern},{avg},{trials}, {bits}')
+    print(f'{algo},{p},{sp_print},{M},{K},{N},{sp_pattern},{avg},{trials},{bits}')
+    file.write(f'{algo},{p},{sp_print},{M},{K},{N},{sp_pattern},{avg},{trials},{bits}')
     file.write('\n')
 
 if __name__ == "__main__":
