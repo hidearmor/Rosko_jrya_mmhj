@@ -23,18 +23,6 @@ int main( int argc, char** argv ) {
 	algo = std::string(argv[q++]);
 	filename = std::string(argv[q++]);
 	L3_factor = atof(argv[q++]);
-	// M = atoi(argv[1]); 
-	// K = atoi(argv[2]);
-	// N = atoi(argv[3]);
-	// p = atoi(argv[4]);
-	// sp = atof(argv[5]);
-	// ntrials = atoi(argv[6]);
-	// warmup = atoi(argv[7]);
-	// sp_pattern = std::string(argv[8]);
-	// algo = std::string(argv[9]);
-	// filename = std::string(argv[10]);
-	// L3_factor = atoi(argv[11])
-
 
 	// printf("M = %d, K = %d, N = %d, cores = %d, sparsity = %f, sparsity pattern = %s, algorithm = %s\n", M,K,N,p, ((float) sp) / 100.0, sp_pattern.c_str(), algo.c_str());
 
@@ -72,8 +60,8 @@ int main( int argc, char** argv ) {
 	// printf("\n%f", (float(cake_cntx->L3)/1000000.0f));
 
 	// JOnas
-	// int L3 = (cake_cntx->L3);
-	// cake_cntx->L3 = static_cast<int>(round(L3 * L3_factor));
+	int L3 = (cake_cntx->L3);
+	cake_cntx->L3 = static_cast<int>(round(L3 * L3_factor));
 
 	// printf("\n%f\n", (float(cake_cntx->L3)/1000000.0f));
 	// free(cake_cntx);
