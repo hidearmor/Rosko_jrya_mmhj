@@ -30,7 +30,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 
 
-def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details, fname = "plot_p_3D_constant_N", time_type="rosko-time"):
+def plot_3D_cache_sp(
+        plot_type,
+        L3_factors,
+        sparsity_patterns,
+        sparsities,
+        ps,
+        n,
+        titles,
+        results_fname,
+        env_details,
+        fname = "plot_p_3D_wehweh",
+        time_type="rosko-time"
+    ):
     plt.rcParams.update({'font.size': 12})
     dft = pandas.read_csv(results_fname)
 
@@ -50,15 +62,18 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
         nrows, ncols = num_sppatterns, 1
 
     # Determine min and max runtime values to later fix the Z-axis for all subplots
-    sparsities_min = round(float(min(sparsities)), 1)
-    sparsities_max = round(float(max(sparsities)), 1)
-    ps_min = min(int(p) for p in ps)
-    ps_max = max(int(p) for p in ps)
+    L3_factor_min = round(float(min(L3_factors)), 1)
+    L3_factor_max = round(float(max(L3_factors)), 1)
+
+    comparison_elem_min = round(float(min(ps)), 1) if plot_type == 'p' else round(float(min(sparsities)), 1)
+    comparison_elem_max = round(float(max(ps)), 1) if plot_type == 'p' else  round(float(max(sparsities)), 1)
+
     filter = (dft['algo'] == 'rosko') & (dft['N'] == n) & \
-             (round(dft['sp'], 1) >= sparsities_min) & \
-             (round(dft['sp'], 1) <= sparsities_max) & \
-             (dft['p'] >= ps_min) & \
-             (dft['p'] <= ps_max)
+             (round(dft['L3_factor'], 1) >= L3_factor_min) & \
+             (round(dft['L3_factor'], 1) <= L3_factor_max) & \
+             (round(dft[plot_type], 1) >= comparison_elem_min) & \
+             (round(dft[plot_type], 1) <= comparison_elem_max)
+    
     min_runtime = dft[filter]['rosko-time'].min()
     max_runtime = dft[filter]['rosko-time'].max()
 
@@ -75,40 +90,47 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
 
     for i_spp in range(len(sparsity_patterns)):
         constants_filter = filter & (dft['sppattern'] == sparsity_patterns[i_spp])
-        rosko_ps = dft[constants_filter]['p']
-        rosko_sps = dft[constants_filter]['sp']
+        # rosko_L3_factor = dft[constants_filter]['p']
+        rosko_L3_factor = dft[constants_filter]['L3_factor']
+        rosko_comparison_elem = dft[constants_filter]['p'] if plot_type == 'p' else dft[constants_filter]['sp']
         rosko_times = dft[constants_filter][time_type]
 
         if DEBUG:
             print(dft.dtypes)
-            print(rosko_ps)
-            print(rosko_sps)
+            print(rosko_L3_factor)
+            print(rosko_comparison_elem)
             print(rosko_times)
 
         # Grid formatting specifically for plot_surface arguments
-        x1 = np.linspace(rosko_ps.min(), rosko_ps.max(), len(rosko_ps.unique()))
-        y1 = np.linspace(rosko_sps.min(), rosko_sps.max(), len(rosko_sps.unique()))
+        x1 = np.linspace(rosko_L3_factor.min(), rosko_L3_factor.max(), len(rosko_L3_factor.unique()))
+        y1 = np.linspace(rosko_comparison_elem.min(), rosko_comparison_elem.max(), len(rosko_comparison_elem.unique()))
         x2, y2 = np.meshgrid(x1, y1)
-        z2 = griddata((rosko_ps, rosko_sps), rosko_times, (x2, y2), method='cubic')
+        z2 = griddata((rosko_L3_factor, rosko_comparison_elem), rosko_times, (x2, y2), method='cubic')
         
         # Plot the surface plot with the datapoints in (surface + scatter)
         ax = axes[i_spp]
-        # surf = ax.plot_trisurf(rosko_ps.values, rosko_sps.values, rosko_times.values, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        # surf = ax.plot_trisurf(rosko_L3_factor.values, rosko_comparison_elem.values, rosko_times.values, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
         surf = ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime, alpha=0.5)
-        surf = ax.scatter3D(rosko_ps.values, rosko_sps.values, rosko_times.values, alpha = 0.9, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
-        ax.plot(rosko_ps.values, rosko_sps.values, 'k.', zdir='z', zs=min_runtime, alpha=0.2)
+        surf = ax.scatter3D(rosko_L3_factor.values, rosko_comparison_elem.values, rosko_times.values, alpha = 0.9, c=(rosko_times.values), cmap=cm.jet_r, linewidth=0.1, vmin=min_runtime, vmax=max_runtime)
+        
+        ax.plot(rosko_L3_factor.values, rosko_comparison_elem.values, 'k.', zdir='z', zs=min_runtime, alpha=0.2)
         ax.contourf(x2, y2, z2,zdir='z', offset=min_runtime, cmap=cm.jet_r, alpha=0.2,  vmin=min_runtime, vmax=max_runtime)
 
         # Add subplot-specific title and labels and more
         title = titles[i_spp]
         official_title = title[0].title() + title[1 :]
+
         ax.set_title(f"{official_title}", fontsize=14, pad=2)
-        ax.set_xlabel("Threads (p)")
-        ax.set_xlim(ps_min, ps_max)
+        ax.set_xlabel("L3 multiply factor")
+        ax.set_xlim(L3_factor_min, L3_factor_max)
+        # ax.set_xlim(ps_min, ps_max)
         # ax.set_xticks(np.arange(ps_min, ps_max+1, 20.0))
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_ylabel("Sparsity [%]")
-        ax.set_yticks(np.arange(sparsities_min, sparsities_max+1, 10.0))
+
+        ylabel = 'sp' if plot_type == "Sparsity [%]" else "p"
+        ax.set_ylabel(ylabel)
+
+        ax.set_yticks(np.arange(comparison_elem_min, comparison_elem_max+1, 10.0))
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.invert_yaxis()
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
@@ -161,82 +183,6 @@ def closest(lst, val):
     idx = (np.abs(lst - val)).argmin()
     return lst[idx]
 
-# def inc(value):
-#     current = value[0]
-#     # print(current)
-#     value[0] += 1
-#     return current
-
-
-# def main():
-#     if DEBUG: print(sys.argv)
-
-#     # Read the sparsity patterns used in the experiment and write them in sparsity_patterns array
-#     num_sparsity_patterns = int(sys.argv[1])
-#     sparsity_patterns = []
-
-#     for i in range(num_sparsity_patterns):
-#         sparsity_pattern = sys.argv[2+i]
-#         if sparsity_pattern not in ALLOWED_SPARSITY_PATTERNS:
-#             raise ValueError(f"Sparsity pattern '{sparsity_pattern}' is not allowed.")
-#             sys.exit()
-#         sparsity_patterns.append(sparsity_pattern)
-
-
-#     # Read the sparsity values used in experiment and write them in sparsities array
-#     num_sparsities = int(sys.argv[2+num_sparsity_patterns])
-#     sparsities = []
-
-#     for i in range(num_sparsities):
-#         sparsity = sys.argv[3+num_sparsity_patterns+i]
-#         sparsities.append(sparsity)
-		
-#     # Read the core values used in experiment and write them in ps array
-#     num_ps = int(sys.argv[3+num_sparsity_patterns+num_sparsities])
-#     ps = []
-
-#     for i in range(num_ps):
-#         p = sys.argv[4+num_sparsity_patterns+num_sparsities+i]
-#         ps.append(p)
-
-
-#     # Read the the n-parameters necessary to compute the list of ns
-#     n_start = int(sys.argv[4+num_sparsity_patterns+num_sparsities+num_ps])
-
-#     n_end = int(sys.argv[5+num_sparsity_patterns+num_sparsities+num_ps])
-
-#     n_step = int(sys.argv[6+num_sparsity_patterns+num_sparsities+num_ps])
-
-#     ns = list(range(n_start, n_end+1, n_step))
-
-
-#     # Read the name of the results file
-#     results_fname = sys.argv[7+num_sparsity_patterns+num_sparsities+num_ps]
-	
-#     # Read the environment details, containing hyperthreading and user info
-#     env_details = sys.argv[8+num_sparsity_patterns+num_sparsities+num_ps]
-	
-#     # Define part of the plot-title depending on the sparsity pattern
-#     titles = []
-
-#     for sppattern in sparsity_patterns:
-#         titles.append(makeTitle(sppattern))
-
-#     # CREATE 3D PLOTS
-
-#     sparsity = closest(sparsities, 90.0) # Choose the value in sparsities that is cloest to 90% sparsity as constant for 3D plot
-
-#     if DEBUG:
-#         print("Some of the inputs to plot_3D_constant_sparsity:")
-#         print(sparsity_patterns, sparsity, ps, ns)
-
-#     n = ns[len(ns)-1] # Use the largest n as constant for 3D plot
-	
-#     if DEBUG:
-#         print("Some of the inputs to plot_3D_constant_N:")
-#         print(sparsity_patterns, sparsities, ps, n)    
-
-    # plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details)
 
 def inc(value):
     current = value[0]
@@ -296,7 +242,7 @@ def main():
     for i in range(L3_factors_length):
         L3_factors.append(sys.argv[inc(j)])
 
-    plot_p_or_sp = sys.argv[inc(j)]
+    plot_type = sys.argv[inc(j)]
 
     # Define part of the plot-title depending on the sparsity pattern
     titles = [makeTitle(sppattern) for sppattern in sparsity_patterns]
@@ -312,10 +258,11 @@ def main():
     n = ns[-1]  # Use the largest n as constant for the 3D plot
 
     if DEBUG:
-        print("Some of the inputs to plot_3D_constant_N:")
+        print("Some of the inputs to plot_3D:")
         print(sparsity_patterns, sparsities, ps, n)
     
-    plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details)
+    plot_3D_cache_sp(plot_type, L3_factors,sparsity_patterns, sparsities, ps, n, titles, results_fname, env_details)
+         
 
 
 
