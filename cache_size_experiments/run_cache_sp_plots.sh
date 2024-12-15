@@ -76,7 +76,7 @@ fi
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
-L3_factors=(0.1 0.25 0.5 1.0 1.1 1.5 2.0)
+L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
 num_sparsity_patterns=${#sparsity_patterns[@]}
 num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}

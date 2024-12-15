@@ -52,7 +52,7 @@ elif [ "$person" == "jrya" ]; then
 	declare -i trials=15
 	declare -i warmups=10
 	n=8192
-	ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300)
+	ps=(6 7 14 30 50 75 100 125 150 175 200 300)
 	measure="mm" # options: all, packing, mm
 
 else
@@ -70,7 +70,7 @@ fi
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
 num_sparsity_patterns=${#sparsity_patterns[@]}
-L3_factors=(0.1 0.25 0.5 1.0 1.1 1.5 2.0)
+L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
 sparsity_values=(90)
 num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}
