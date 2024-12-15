@@ -40,11 +40,13 @@ def plot_3D_cache_sp(
         titles,
         results_fname,
         env_details,
-        fname = "plot_p_3D_wehweh",
+        fname = "plot3D_L3size_",
         time_type="rosko-time"
     ):
     plt.rcParams.update({'font.size': 12})
     dft = pandas.read_csv(results_fname)
+
+    fname = fname + 'p' if plot_type == 'p' else fname + 'sparsity'
 
     # create results folders if not there and put plots in them, and get time
     file_path = Path('./' + results_fname)
@@ -136,7 +138,7 @@ def plot_3D_cache_sp(
 
         # ax.set_yticks(np.arange(comparison_elem_min, comparison_elem_max+1, 10.0))
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
-        ax.invert_yaxis()
+        if plot_type == 'sp': ax.invert_yaxis()
         # ax.set_yticks(np.asarray(sparsities, dtype=float))
         ax.set_zlabel("Running time [sec]")
         ax.set_zlim(min_runtime, max_runtime)
