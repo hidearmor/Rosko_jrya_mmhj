@@ -18,7 +18,7 @@ ALLOWED_ALGOS_WITH_LABEL =  {'rosko':'Rosko',
                              'numpy_csr':'NumPy-CSR', 
                              'naive':'Naive', 
                              'numpy_dense':'NumPy-Dense, zeros stripped', 
-                             'numpy_dia':'Numpy-Diagonal'}
+                             'numpy_dia':'NumPy-Diagonal'}
 ALLOWED_SPARSITY_PATTERNS = ['random-uniform', 
                              'row-pattern', 
                              'diagonal', 

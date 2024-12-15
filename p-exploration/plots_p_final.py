@@ -123,8 +123,8 @@ def plot_3D_constant_N(sparsity_patterns, sparsities, ps, n, titles, results_fna
 
     # Add the title for the whole figure
     # official_suptitle = "3D Running time Surface Plots for Rosko, for Different Sparsity Patterns and N=" + str(n)
-    official_suptitle = "3D running time surface plots for Rosko, for different sparsity patterns on Intel-i5"
-    # official_suptitle = "3D running time surface plots for Rosko, for different sparsity patterns on Intel-i7"
+    official_suptitle = "Parameter-tuning for Rosko SDMM on Intel Core i5"
+    # official_suptitle = "Parameter-tuning for Rosko SDMM on Intel Core i7"
     fig.suptitle(official_suptitle, fontsize=16)
     # fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
     # fig.align_titles()
