@@ -52,7 +52,8 @@ elif [ "$person" == "jrya" ]; then
 	declare -i trials=15
 	declare -i warmups=10
 	n=8192
-	ps=(6 7 14 30 50 75 100 125 150 175 200 300)
+	ps=(6 7 14 30 50 75 100)
+	# ps=(6 7 14 30 50 75 100 125 150 175 200 300)
 	measure="mm" # options: all, packing, mm
 
 else
