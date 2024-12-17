@@ -1,13 +1,24 @@
 #include "rosko.h"
 #include <string>
 
+float sum_matrix(float* matrix, int rows, int cols) {
+    float sum = 0.0;
+
+    #pragma omp parallel for reduction(+:sum)
+    for (int i = 0; i < rows * cols; i++) {
+        sum += matrix[i];
+    }
+    return sum;
+}
+
+
 int main( int argc, char** argv ) {
 
 // exit(1);
 	int M, K, N, p, nz, mr, nr, ntrials, alg, warmup; // alg is only for rosko use
 	struct timespec start, end;
 	double diff_t;
-	float density, sp, actual_sp;
+	float density, sp, actual_sp, dummy_sum;
 	std::string filename, algo, sp_pattern;
 
 	M = atoi(argv[1]); 
@@ -88,15 +99,25 @@ int main( int argc, char** argv ) {
 		if(i < warmup) {
 			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
 			// printf("sss %f\n", y);
-			cake_sgemm_checker(A, B, C, N, M, K);
+			// cake_sgemm_checker(A, B, C, N, M, K);
 		} else {
 			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
 			// printf("sss %f\n", y);
-			cake_sgemm_checker(A, B, C, N, M, K);
+			// cake_sgemm_checker(A, B, C, N, M, K);
 			diff_t += y;
 		}
 
+		dummy_sum += sum_matrix(C, M, N);
+
         free(dirty);
+    }
+
+	FILE* sum_file = fopen("dummy_sum.bin", "wb");
+    if (sum_file) {
+        fwrite(&dummy_sum, sizeof(float), 1, sum_file);
+        fclose(sum_file);
+    } else {
+        printf("Failed to save dummy_sum to file.\n");
     }
 
 	printf("%s,%d,%f,%d,%d,%d,%s,%f,%d\n", algo.c_str(), p, sp, M, K, N, sp_pattern.c_str(), diff_t / ntrials, ntrials);

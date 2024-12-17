@@ -115,21 +115,25 @@ def main(N, M, K, p, sp_raw, trials, warmups, sp_pattern, algo, filename):
     res_total = 0.0
     result = None
     
-    dummy = np.random.rand(M,N).astype(np.float32)
+    # dummy = np.random.rand(M,N).astype(np.float32)
+    dummy_sum = 0.0
 
     for i in range(warmups):
         _, result = numpyMM(matrix_A, matrix_B)
-        dummy = np.add(dummy, result_matrix)
+        # dummy = np.add(dummy, result_matrix)
+        dummy_sum += np.sum(result)
     
 
     for i in range(trials):
         res_part = 0.0
         res_part, result_matrix = numpyMM(matrix_A, matrix_B)
-        dummy = np.add(dummy, result_matrix)
+        # dummy = np.add(dummy, result_matrix)
+        dummy_sum += np.sum(result_matrix)
         if DEBUG: print_matrices(matrix_A, matrix_B, result_matrix, algo)
         res_total += res_part
 
-    np.save('dummy', dummy.astype(np.float32))
+    # np.save('dummy', dummy.astype(np.float32))
+    np.save('dummy_sum', np.array([dummy_sum], dtype=np.float32))
     
     avg = round(res_total / trials, 6)
     file = open(filename, 'a')
