@@ -88,9 +88,11 @@ int main( int argc, char** argv ) {
 		if(i < warmup) {
 			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
 			// printf("sss %f\n", y);
+			cake_sgemm_checker(A, B, C, N, M, K);
 		} else {
 			float y = rosko_sgemm(A, B, C, M, N, K, p, cake_cntx, density, NULL, 0, NULL, 0, 1, 0, KMN, alg);
 			// printf("sss %f\n", y);
+			cake_sgemm_checker(A, B, C, N, M, K);
 			diff_t += y;
 		}
 

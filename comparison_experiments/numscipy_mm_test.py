@@ -115,15 +115,17 @@ def main(N, M, K, p, sp_raw, trials, warmups, sp_pattern, algo, filename):
     res_total = 0.0
     result = None
     
+    dummy = np.random.rand(M,N).astype(np.float32)
+
     for i in range(warmups):
         _, result = numpyMM(matrix_A, matrix_B)
+        dummy = np.add(dummy, result_matrix)
     
-    dummy = np.random.rand(K,N).astype(np.float32)
 
     for i in range(trials):
         res_part = 0.0
         res_part, result_matrix = numpyMM(matrix_A, matrix_B)
-        dummy = dummy + result_matrix
+        dummy = np.add(dummy, result_matrix)
         if DEBUG: print_matrices(matrix_A, matrix_B, result_matrix, algo)
         res_total += res_part
 
