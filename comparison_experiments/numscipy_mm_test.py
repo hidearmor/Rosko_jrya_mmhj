@@ -117,12 +117,17 @@ def main(N, M, K, p, sp_raw, trials, warmups, sp_pattern, algo, filename):
     
     for i in range(warmups):
         _, result = numpyMM(matrix_A, matrix_B)
+    
+    dummy = np.random.rand(K,N).astype(np.float32)
 
     for i in range(trials):
         res_part = 0.0
         res_part, result_matrix = numpyMM(matrix_A, matrix_B)
+        dummy = dummy + result_matrix
         if DEBUG: print_matrices(matrix_A, matrix_B, result_matrix, algo)
         res_total += res_part
+
+    np.save('dummy', dummy.astype(np.float32))
     
     avg = round(res_total / trials, 6)
     file = open(filename, 'a')
