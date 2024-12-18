@@ -39,11 +39,15 @@ if [ "$person" == "mmhj" ]; then
 
     echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
     
-	declare -i trials=15
-	declare -i warmups=10
-	n=6144
+	# declare -i trials=15
+	declare -i trials=4
+	# declare -i warmups=10
+	declare -i warmups=2
+	# n=6144
+	n=4096
 	ps=(4)
-	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
+	# sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
+	sparsity_values=(60 85 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 	measure="mm" # options: all, packing, mm
 
@@ -76,7 +80,8 @@ fi
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
-L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
+# L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
+L3_factors=(0.1 2.0)
 num_sparsity_patterns=${#sparsity_patterns[@]}
 num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}
