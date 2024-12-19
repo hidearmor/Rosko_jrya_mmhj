@@ -39,15 +39,15 @@ if [ "$person" == "mmhj" ]; then
 
     echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
     
-	# declare -i trials=15
-	declare -i trials=4
-	# declare -i warmups=10
-	declare -i warmups=2
-	# n=6144
-	n=4096
+	declare -i trials=15
+	# declare -i trials=4
+	declare -i warmups=10
+	# declare -i warmups=2
+	n=6144
+	# n=4096
 	ps=(4)
-	# sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
-	sparsity_values=(60 85 99.9)
+	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9)
+	# sparsity_values=(60 85 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 	measure="mm" # options: all, packing, mm
 
@@ -80,8 +80,8 @@ fi
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 sparsity_patterns=("random-uniform" "diagonal" "row-pattern" "column-pattern") # options: random-uniform, diagonal, row-pattern, column-pattern
-# L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
-L3_factors=(0.1 2.0)
+L3_factors=(0.1 0.175 0.25 0.5 0.75 1.0 1.1 1.25 1.5 1.75 2.0)
+# L3_factors=(0.1 2.0)
 num_sparsity_patterns=${#sparsity_patterns[@]}
 num_L3_factors=${#L3_factors[@]}
 num_ps=${#ps[@]}
@@ -96,7 +96,7 @@ do
 			for L3_factor in ${L3_factors[@]}
 			do
 				# echo $n $p $sp $sparsity_pattern $L3_factor
-				./rosko_sgemm_test 	$n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
+				./rosko_sgemm_test $n $n $n $p $sp $trials $warmups $sparsity_pattern rosko $FILE $L3_factor
 			done
 		done
 	done
@@ -121,7 +121,7 @@ plot_type="sp"
 
 cp $FILE $path$time$unscr$FILE$unscr$measure$nameHype
 
-# python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
+python3 plots_cache_3D.py $num_sparsity_patterns ${sparsity_patterns[@]} $num_sparsity_values ${sparsity_values[@]} $num_ps ${ps[@]} $n $n 1 $FILE $nameHype $num_L3_factors ${L3_factors[@]} $plot_type
 
 commit_hash=$(git rev-parse HEAD)
 logName="commit_hash"
