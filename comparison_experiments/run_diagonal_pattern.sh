@@ -73,8 +73,8 @@ hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
 algorithms=("rosko" "rosko_base" "numpy_dia")  # options: rosko, rosko_base, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 num_algorithms=${#algorithms[@]}  # the number of algorithms used in this experiment
 sparsity_pattern="diagonal"  # options: random-uniform, diagonal, row-pattern, column-pattern
-# sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
-sparsity_values=(97 98 99 99.5 99.7 99.9)
+sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
+# sparsity_values=(97 98 99 99.5 99.7 99.9)
 # sparsity_values=(60 70 80 90 95 98 99 99.5 99.7 99.9)  # Define sparsity values as an array
 num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 
@@ -83,7 +83,9 @@ do
 
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups random-uniform rosko_base $FILE
-	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dia $FILE
+	if awk "BEGIN {exit !($sp > 90.0)}"; then
+		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dia $FILE
+	fi
 
 done
 
