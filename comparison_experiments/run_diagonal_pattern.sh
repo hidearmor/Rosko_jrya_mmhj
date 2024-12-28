@@ -83,9 +83,9 @@ do
 
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups $sparsity_pattern rosko $FILE
 	./rosko_sgemm_test $n $n $n $cores $sp $trials $warmups random-uniform rosko_base $FILE
-	# if awk "BEGIN {exit !($sp > 90.0)}"; then
+	if awk "BEGIN {exit !($sp > 85.0)}"; then
 		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_dia $FILE
-	# fi
+	fi
 
 done
 
