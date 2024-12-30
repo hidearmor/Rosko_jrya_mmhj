@@ -9,7 +9,6 @@ def main(A_filename, B_filename, C_filename):
     matrix_A = np.load(A_filename).astype(np.float32)
     matrix_B = np.load(B_filename).astype(np.float32)
 
-    # Perform matrix multiplication
     result = numpyMM(matrix_A, matrix_B)
 
     matrix_A = np.load(A_filename)

@@ -14,9 +14,6 @@ CFLAGS_tmp         := $(call get-user-cflags-for,$(CONFIG_NAME))
 # # Add local header paths to CFLAGS
 # CFLAGS_tmp        += -I$(ROSKO_HOME)/include -I$(CAKE_HOME)/include
 
-# CFLAGS_blis := $(CFLAGS)
-# CFLAGS_blis		  += -I$(BLIS_INC_PATH)
-
 # # rosko shared library
 # LIBS      := -L$(ROSKO_HOME) -lrosko -L$(CAKE_HOME) -lcake
 # # LIBS := -Wl,-rpath,$(ROSKO_HOME) -L$(ROSKO_HOME) -lrosko -Wl,-rpath,$(CAKE_HOME) -L$(CAKE_HOME) -lcake

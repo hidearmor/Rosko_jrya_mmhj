@@ -39,7 +39,6 @@ float* numpy(float* A, float* B, int M, int N, int K) {
 
     call_python_script("A.npy", "B.npy", "C.npy");
 
-    // Load the result matrix C into the existing C buffer
     cnpy::NpyArray arr = cnpy::npy_load("C.npy");
     if (arr.shape.size() == 0) {
         std::cerr << "Failed to load matrix C from C.npy!" << std::endl;
@@ -48,7 +47,6 @@ float* numpy(float* A, float* B, int M, int N, int K) {
 
     float* data = arr.data<float>();
 
-    // Copy data from the loaded result into the original C buffer
     std::memcpy(C, data, M * N * sizeof(float));
     return C;
 }
@@ -92,25 +90,20 @@ std::vector<Triplet> generateShapes(int maxDimSize) {
     std::vector<Triplet> shapes;
     int minDimSize = 200;
 
-    // Determine the number of shapes to generate (between 5 and 10)
     int numShapes = std::max(5, std::min(8, maxDimSize / minDimSize));
 
-    // Create a non-linear distribution for sizes
     std::vector<int> sizes;
     for (int i = 0; i < numShapes; ++i) {
-        // Use quadratic scaling to distribute sizes more densely at the lower range
         float factor = static_cast<float>(i) / (numShapes - 1); // range from 0 to 1
         int size = minDimSize + static_cast<int>((maxDimSize - minDimSize) * (factor * factor));
         sizes.push_back(size);
     }
 
-    // Generate shapes using combinations of the non-linearly distributed sizes
     for (int i = 0; i < numShapes; ++i) {
         int m = sizes[i % sizes.size()];
         int n = sizes[(i + 1) % sizes.size()];
         int k = sizes[(i + 2) % sizes.size()];
 
-        // Alternate between square and non-square shapes
         if (i % 2 == 0) {
             m = n = k = sizes[i % sizes.size()];
         }

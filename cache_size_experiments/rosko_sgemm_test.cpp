@@ -59,15 +59,14 @@ int main( int argc, char** argv ) {
 	cake_cntx_t* cake_cntx = cake_query_cntx();
 	// printf("\n%f", (float(cake_cntx->L3)/1000000.0f));
 
-	// JOnas
+	// Chaning perceived L3-size
 	int L3 = (cake_cntx->L3);
 	cake_cntx->L3 = static_cast<int>(round(L3 * L3_factor));
 
+	// for debugging
 	// printf("\n%f\n", (float(cake_cntx->L3)/1000000.0f));
 	// free(cake_cntx);
 	// printf("\n%d", cake_cntx->L3);
-
-	// return 0;
 
 	char fname[50];
 	snprintf(fname, sizeof(fname), "%s", filename.c_str());

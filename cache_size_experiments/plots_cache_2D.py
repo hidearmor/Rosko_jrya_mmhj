@@ -106,7 +106,6 @@ def main():
     
 	if DEBUG: print(sys.argv)
  
-    # Read the type of sparsity pattern from input
 	sparsity_pattern = sys.argv[1]
 	if sparsity_pattern not in ALLOWED_SPARSITY_PATTERNS:
 		# print(sparsity_pattern + " is not a valid type of sparsity pattern\n")
@@ -143,7 +142,6 @@ def main():
 	
 	# Define part of the plot-title depending on the sparsity pattern
 	title = makeTitle(sparsity_pattern)
-
  
 	if DEBUG:
 		print(sparsity_pattern, algos, sparsities, labels)
