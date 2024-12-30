@@ -4,8 +4,6 @@ ifneq ($(strip $(BLIS_INSTALL_PATH)),)
 BLIS_INC_PATH   := $(BLIS_INSTALL_PATH)/include/blis
 endif
 
-# g++ rosko_sgemm_test.cpp -I/usr/local/include/blis -I/tmp/ROSKO_on_CPU/include -L/tmp/ROSKO_on_CPU  -lrosko -o testing
-
 TEST_OBJ_PATH  := .
 
 # Use the "framework" CFLAGS for the configuration family.
@@ -47,17 +45,9 @@ CFLAGS 	:= $(filter-out -std=c99, $(CFLAGS_tmp))
 
 all: $(TARGETS)
 
-# rosko_blis: $(wildcard *.h) $(wildcard *.c)
-# 	g++ $(CFLAGS_blis) rosko_sgemm_test.cpp $(LIBS) -o rosko_sgemm_test
-
-# rosko_armv8: $(wildcard *.h) $(wildcard *.c)
-# 	g++ -O3 $(CFLAGS) rosko_sgemm_test.cpp $(LIBS) -o rosko_sgemm_test
-
 rosko_haswell: $(wildcard *.h) $(wildcard *.c)
 	g++ $(CFLAGS) correctness_test.cpp $(LIBS) -o correctness_test
 
-# crisko_haswell: $(wildcard *.h) $(wildcard *.c)
-# 	g++ $(CFLAGS) crisko_sgemm_test.cpp $(LIBS) -o crisko_sgemm_test
 
 clean:
 	rm -rf *.o *.so
