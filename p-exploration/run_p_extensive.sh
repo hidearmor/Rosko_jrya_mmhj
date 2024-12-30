@@ -39,27 +39,14 @@ if [ "$person" == "mmhj" ]; then
 
     echo "Running as mmhj - Setting specific experiment parameters for mmhj computer"
     
-	# declare -i trials=10
-	# declare -i warmups=10
-	# declare -i trials=1
-	# declare -i warmups=1
 	declare -i trials=10
 	declare -i warmups=5
 	n_start=512
-	# n_end=2048
-	# n_end=4096
 	n_end=2560
-	# n_end=1024
-	# n_end=10240
 	n_step=512
-	# ps=(1 2 3 4)
 	ps=(1 2 3 4 5 6 7 8 9 10 15 20 35 40 45 50 60 70 80 90 100)
-	# ps=(1 2 3 4 5 6 7 8 9 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 45 50 55 60 65 75 80 85 90 95 100)
-	# ps=(1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90 100 120 140 160 180 200 300 400 500 700 800 900 1000)
 	num_ps=${#ps[@]}
-	# sparsity_values=(98 99 99.9)
 	sparsity_values=(50 60 70 85 95 97 98 99 99.9)
-	# sparsity_values=(20 30 40 50 60 70 80 85 90 95 97 98 99)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
 	measure="mm" # options: all, packing, mm
 
@@ -70,13 +57,9 @@ elif [ "$person" == "jrya" ]; then
 	declare -i trials=30
 	declare -i warmups=10
 	n_start=512
-	# n_end=2048
 	n_end=8192
-	# n_end=10240
 	n_step=512
 	ps=(1 2 3 4 5 6 10 14 20 40 43 46 50 75 100 125 150 175 200)
-	# ps=(225 230 235 240 245 250 255 260 265 270)
-	# ps=(100000)
 	num_ps=${#ps[@]}
 	sparsity_values=(20 30 40 50 60 70 80 85 90 95 97 98 99 99.9)
 	num_sparsity_values=${#sparsity_values[@]} # the number of sparsity values used in this experiment
