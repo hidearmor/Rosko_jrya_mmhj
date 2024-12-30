@@ -10,20 +10,9 @@ cd $x;
 echo $ROSKO_HOME;
 echo $CAKE_HOME;
 
-# export GOMP_CPU_AFFINITY="0 1 2 3 4 5 6 7 8 9";
-
-# x=$PWD
-# sudo cp mkl_sparse_gemm.cpp /opt/intel/oneapi/mkl/2021.1.1/examples/sycl/spblas
-# cd /opt/intel/oneapi/mkl/2021.1.1/examples/sycl
-# make sointel64 examples="spblas/mkl_sparse_gemm" sycl_devices=cpu
-# cp _results/intel64_so_tbb/spblas/mkl_sparse_gemm.out $x
-# cd $x
-
 
 make clean;
 make;
-
-# filename="results" #Mayas imp
 
 # check if results exists and if it does, move it
 FILE="results_comp_row-pattern"
@@ -55,7 +44,6 @@ if [ "$person" == "mmhj" ]; then
     
 	declare -i trials=30
 	declare -i warmups=10
-	# declare -i n=4096
 	declare -i n=6144
 	declare -i cores=4
 
@@ -65,7 +53,6 @@ elif [ "$person" == "jrya" ]; then
     
 	declare -i trials=30
 	declare -i warmups=10
-	# declare -i n=6144
 	declare -i n=8192
 	declare -i cores=6
 

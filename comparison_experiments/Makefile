@@ -4,8 +4,6 @@ ifneq ($(strip $(BLIS_INSTALL_PATH)),)
 BLIS_INC_PATH   := $(BLIS_INSTALL_PATH)/include/blis
 endif
 
-# g++ rosko_sgemm_test.cpp -I/usr/local/include/blis -I/tmp/ROSKO_on_CPU/include -L/tmp/ROSKO_on_CPU  -lrosko -o testing
-
 TEST_OBJ_PATH  := .
 
 # Use the "framework" CFLAGS for the configuration family.

@@ -13,8 +13,6 @@ echo $CAKE_HOME;
 make clean;
 make;
 
-# filename="results" #Mayas imp
-
 # check if results exists and if it does, move it
 FILE="results_comp_diagonal"
 
