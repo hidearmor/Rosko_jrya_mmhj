@@ -587,8 +587,8 @@ void schedule_KMN_sp(sp_pack_t* sp_pack, float* B_p, float* C, float** C_p, int 
 	int print = 0;
 	if (print == 1)
 	{
-		printf("\nm_c: %d", m_c);
-		printf("\nm_c1: %d", m_c1);
+		printf("\nm_c: %d, k_c: %d, n_c: %", m_c, k_c, n_c);
+		printf("\nm_c1: %d, k_c1: %d, n_c1: %d", m_c1, k_c1, n_c1);
 		printf("\nmr_rem: %d", mr_rem);
 		printf("\np_l: %d", p_l);
 		printf("\nm_pad: %d, n_pad: %d, k_pad: %d, ", m_pad, n_pad, k_pad);

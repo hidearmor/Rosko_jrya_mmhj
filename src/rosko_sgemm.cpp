@@ -19,6 +19,7 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 	// sch = set_schedule(sch, M, N, K);
 
 	if(cake_cntx == NULL) {
+		printf("\nnullify L3\n");
 		cake_cntx = cake_query_cntx();
 	}
 
@@ -29,8 +30,8 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 	init_sparse_block_dims(M, N, K, p, x, cake_cntx, sch, argv, density, 4, alg, mcu, kcu, ncu);
 	omp_set_num_threads(p);
 
-	if(DEBUG) printf("m_r = %d, n_r = %d\n\n", cake_cntx->mr, cake_cntx->nr);
-	if(DEBUG) printf("mc = %d, kc = %d, nc = %d, alpha_n = %f\n", x->m_c, x->k_c, x->n_c, cake_cntx->alpha_n);
+	// printf("m_r = %d, n_r = %d\n\n", cake_cntx->mr, cake_cntx->nr);
+	// printf("mc = %d, kc = %d, nc = %d, alpha_n = %f\n", x->m_c, x->k_c, x->n_c, cake_cntx->alpha_n);
 
 
 	if(sp_pack == NULL) {
@@ -86,6 +87,9 @@ double rosko_sgemm(float* A, float* B, float* C, int M, int N, int K, int p,
 		for(int i = 0; i < p; i++) {
 			C_p[i] = (float*) calloc(x->m_c * x->n_c, sizeof(float));
 		}
+
+		// printf("m_r = %d, n_r = %d\n\n", cake_cntx->mr, cake_cntx->nr);
+		// printf("mc = %d, kc = %d, nc = %d, alpha_n = %f\n", x->m_c, x->k_c, x->n_c, cake_cntx->alpha_n);
 
 		clock_gettime(CLOCK_REALTIME, &start);
 
