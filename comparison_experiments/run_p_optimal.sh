@@ -66,10 +66,8 @@ elif [ "$person" == "jrya" ]; then
     
 	declare -i trials=30
 	declare -i warmups=10
-	# declare -i n=6144
 	declare -i n=8192
-	declare -i n=200
-	ps=(6 10 20 40 43 46 50)
+	ps=(6 20 50 100 200)
 	num_ps=${#ps[@]}
 	declare -i cores=6
 
@@ -77,18 +75,19 @@ else
 
     echo "Running as another user - Applying general settings"
 	
-	declare -i trials=1
+	declare -i trials=6
 	declare -i warmups=1
-	declare -i n=512
-	ps=(4 20)
+	declare -i n=8192
+	ps=(6 20 50 100 200)
 	num_ps=${#ps[@]}
-	declare -i cores=1
+	declare -i cores=6
 
 fi
 
 
 hyperthreading=$($ROSKO_HOME/thesis_utils/hyperthreading.sh)
-algorithms=("numpy_arr" "numpy_csr")  # options: rosko, rosko_base, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+# algorithms=("numpy_arr" "numpy_csr")  # options: rosko, rosko_base, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
+algorithms=("numpy_arr")  # options: rosko, rosko_base, naive, numpy_csr, numpy_arr, numpy_dia, numpy_dense
 # Loop over ps to build the algorithms array
 for p in ${ps[@]}; 
 do
@@ -106,9 +105,9 @@ for sp in ${sparsity_values[@]};
 do
 	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_arr $FILE
 
-	if awk "BEGIN {exit !($sp > 70.0)}"; then
-		python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
-	fi
+	# if awk "BEGIN {exit !($sp > 90.0)}"; then
+	# 	python3 numscipy_mm_test.py $n $n $n $cores $sp $trials $warmups $sparsity_pattern numpy_csr $FILE
+	# fi
 
 	for p in ${ps[@]}
 	do
