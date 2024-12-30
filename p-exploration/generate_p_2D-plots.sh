@@ -12,6 +12,7 @@ echo $CAKE_HOME;
 
 # check if results exists and if it does, move it
 FILE="results_p_extensive"
+FILE_BASELINE="results_baseline"
 
 # Check if the "person" argument is provided
 if [ -z "$1" ]; then
@@ -44,7 +45,7 @@ elif [ "$person" == "jrya" ]; then
 	declare -i warmups=10
 	declare -i n=8192
 	# ps=(6 7 8 9 10 12 14 16 18 20 25 30 35 40 50 75 100 125 150 175 200 300) # full range
-	ps=(6 7 20 50 100)
+	ps=(6 20 50 100)
 	num_ps=${#ps[@]}
 	sparsity_values=(60 70 80 85 90 95 97 98 99 99.9) # full range
 	# sparsity_values=(90 95 97 98 99 99.9)
@@ -90,6 +91,6 @@ unscr="_"
 nameHype=$unscr$hyperthreading$unscr$person
 
 # Call the python plot script with inputs
-python3 plots_p_2D.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $nameHype $num_ps ${ps[@]}
+python3 plots_p_2D.py $sparsity_pattern $num_algorithms ${algorithms[@]} $num_sparsity_values ${sparsity_values[@]} $FILE $FILE_BASELINE $nameHype $num_ps ${ps[@]}
 
 #####################

@@ -30,34 +30,40 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotslib.plot_utils import getPlotsDirectory, directoriesFromTime
 	
 
-def plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title, results_fname, env_details, fname = "plot_comp"):
+def plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title, results_fname, results_baseline_fname, env_details, fname = "plot_comp"):
 	plt.rcParams.update({'font.size': 12})
 	# markers = ['o','v','s','d','^']
 	# colors = ['b','g','k','r','r']
 	markers = ['o', 'v', 's', 'd', '^', 'p', '*', 'h', 'x', '+']
 	colors = ['b', 'g', 'k', 'r', 'c', 'm', 'y', 'orange', 'purple', 'brown']
-	dft = pandas.read_csv(results_fname)
 	# runs = dft['runs'].iloc[0]
+
 
 	# create results folders if not there and put plots in them, and get time
 	file_path = Path('./' + results_fname)
 	creation_datetime = datetime.datetime.fromtimestamp(file_path.stat().st_ctime)
 	plotsDir, dateStr = directoriesFromTime(creation_datetime, os.getcwd())
 	
-	# print(p_values)
-	# return
-	
 	print(p_values)
 	# return
 	plt.figure(figsize = (6,4))
 
+	# plot the NumPy dia from results_baseline_fname
+	dft = pandas.read_csv(results_baseline_fname)
+	max_sp = float(max(sparsities))
+	min_sp = float(min(sparsities))
+	algo_time = dft[(dft['algo'] == 'numpy_arr') & (dft['sppattern'] == sparsity_pattern) & (dft['sp'] < max_sp) & (dft['sp'] >= min_sp)]['time'].values
+	algo_sparsities = dft[(dft['algo'] == 'numpy_arr') & (dft['sppattern'] == sparsity_pattern) & (dft['sp'] < max_sp) & (dft['sp'] >= min_sp)]['sp'].values
+	plt.plot(algo_sparsities, algo_time, label = 'NumPy-Dense', marker = markers[0], color = colors[0])
+
+	dft = pandas.read_csv(results_fname)
 	for i in range(len(p_values)):
 		p = int(p_values[i])
 		max_sp = float(max(sparsities))
 		min_sp = float(min(sparsities))
 		algo_time = dft[(dft['p'] == p) & (dft['sppattern'] == sparsity_pattern) & (dft['sp'] < max_sp) & (dft['sp'] >= min_sp)]['rosko-time'].values
 		algo_sparsities = dft[(dft['p'] == p) & (dft['sppattern'] == sparsity_pattern) & (dft['sp'] < max_sp) & (dft['sp'] >= min_sp)]['sp'].values
-		plt.plot(algo_sparsities, algo_time, label = makeLabel(p), marker = markers[i], color = colors[i])
+		plt.plot(algo_sparsities, algo_time, label = makeLabel(p), marker = markers[i+1], color = colors[i+1])
 
 	
 	# plt.ticklabel_format(useOffset=False, style='plain')
@@ -99,7 +105,7 @@ def isAlgoValid(algo):
 
  
 def makeTitle(sparsity_pattern):
-	return "Running time plot for Rosko with varying threads p on Intel-i5"
+	return "Rosko with varying threads p and NumPy-Dense\nusing random-uniform input on Intel Core i5 "
 
 def makeLabel(p):
 	return 'p = ' + str(p)
@@ -134,14 +140,17 @@ def main():
 	# Read the name of the results file
 	results_fname = sys.argv[4+num_algos+num_sparsities]
 
-	env_details = sys.argv[5+num_algos+num_sparsities]
+	results_baseline_fname = sys.argv[5+num_algos+num_sparsities]
 
-	num_p_values = int(sys.argv[6+num_algos+num_sparsities])
+	env_details = sys.argv[6+num_algos+num_sparsities]
+
+	num_p_values = int(sys.argv[7+num_algos+num_sparsities])
 	p_values = []
 
 	for i in range(num_p_values):
-		p = sys.argv[i + 7 + num_algos + num_sparsities]
+		p = sys.argv[i + 8 + num_algos + num_sparsities]
 		p_values.append(p)
+
 	
 	# Define part of the plot-title depending on the sparsity pattern
 	title = makeTitle(sparsity_pattern)
@@ -151,7 +160,7 @@ def main():
 		print(sparsity_pattern, algos, sparsities, labels)
   
 	# Create the plot
-	plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title, results_fname, env_details)
+	plot_comparison(p_values, algos, sparsities, sparsity_pattern, labels, title, results_fname, results_baseline_fname, env_details)
     
     
 
