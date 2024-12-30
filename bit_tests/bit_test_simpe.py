@@ -64,12 +64,6 @@ def generateMatricesAB(M, N, K, sp, algo, sp_pattern):
             # make a sparse row pattern MxK matrix
             pass
             
-    
-    # DOES NOT WORK - dimensions af matrices in MM don't align    
-    # elif sp_pattern == 'column-pattern':
-    #     K_nz_cols = round(d * K)
-    #     sp = 1.0 - (K_nz_cols / K)
-    #     matrix_A = np.random.rand(M, K_nz_cols)
         
     elif sp_pattern == 'random-uniform':
         matrix_A = scipy.sparse.random_array((N, N), density=d, random_state=rng, format = 'csr', dtype=np.float32)
@@ -104,14 +98,6 @@ def mat_bit(matrix):
 
     return f"{data_type} ({bit_width}-bit)"
 
-# Example usage
-# matrix_int32 = np.array([[1, 2], [3, 4]], dtype=np.int32)
-# print(mat_bit(matrix_int32))  # Output: "Integer (32-bit)"
-# matrix_float64 = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
-# matrix_float32 = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32)
-# print(mat_bit(matrix_float32))  # Output: "Floating point (32-bit)"
-
-
 def printIt(algo, patter):
     N = 20
     M = N
@@ -132,10 +118,3 @@ printIt('numpy_arr','random-uniform')
 printIt('numpy_dia','diagonal')
 # printIt('numpy_dense','column-pattern')
 printIt('numpy_dense','row-pattern')
-
-
-        # ((algo == 'numpy_csr' and sp_pattern == 'random-uniform') or \
-        # (algo == 'numpy_arr' and sp_pattern == 'random-uniform') or \
-        # (algo == 'numpy_dia' and sp_pattern == 'diagonal') or \
-        # # (algo == 'numpy_dense' and sp_pattern == 'column-pattern') or \
-        # (algo == 'numpy_dense' and sp_pattern == 'row-pattern')):
