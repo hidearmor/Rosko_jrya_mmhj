@@ -57,7 +57,8 @@ def plot_comparison(algos, sparsities, sparsity_pattern, labels, title, results_
 	
 	# plt.ticklabel_format(useOffset=False, style='plain')
 	# plt.title('(b) SDMM on Intel Core i7 using\n' + title, fontsize = 18 )
-	plt.title('(a) SDMM on Intel Core i5 using\n' + title, fontsize = 18 )
+	# plt.title('(a) SDMM on Intel Core i5 using\n' + title, fontsize = 18 )
+	plt.title('SDMM on Intel Core i5 using\n' + title, fontsize = 18 )
 	plt.xlabel("Sparsity [%]", fontsize = 16)
 	plt.ylabel("Running time [sec]", fontsize = 16)
 	plt.yticks( fontsize = 10)
